@@ -1,0 +1,45 @@
+/**
+ * = Sidebars (FINAL CLEAN CSS VERSION)
+ */
+
+#doc-index:not(.collapse.show),
+.doc-sidebar {
+    display: none;
+}
+
+/* Desktop breakpoint (lg) */
+@media (min-width: 992px) {
+
+    #doc-index {
+        display: block !important;
+    }
+
+    .doc-sidebar {
+        display: block !important;
+        height: calc(100vh - 2rem);
+        overflow-y: auto;
+        position: sticky;
+        top: 2rem;
+    }
+
+    /* Icon rotation in collapsible menu */
+    .doc-sidebar .nav-link[data-toggle="collapse"] > .icon {
+        transform: rotateZ(-90deg);
+        position: relative;
+        right: .25rem;
+    }
+
+    /* Font size for nav items */
+    .doc-sidebar .nav .nav-item {
+        font-size: 0.875rem; /* same as $font-size-sm */
+    }
+}
+
+/* Floating Upgrade Button */
+.upgrade-to-pro {
+    position: fixed;
+    left: 15px;
+    bottom: 15px;
+    width: 230px;
+    z-index: 999;
+}

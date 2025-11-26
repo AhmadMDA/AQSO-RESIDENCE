@@ -1,0 +1,4 @@
+[
+  { "email": "admin@admin.com", "password": "$2b$10$JPISvCE23h9Sw7DWwqeLheE1rYzlRcq4Fca6/0s7hC8jzYtbxJYea", "role": "admin" },
+  { "email": "pemilik@pemilik.com", "password": "$2b$10$LUxen38VBzumwEw73EDcwuPwkyL/kUtlFVRvEdHUdISJ5SW6ukWei", "role": "pemilik" }
+]
