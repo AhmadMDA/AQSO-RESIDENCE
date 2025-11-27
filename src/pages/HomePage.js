@@ -11,6 +11,7 @@ import Settings from "./Settings";
 import MyProfile from "./MyProfile";
 import RoleManagement from "./RoleManagement";
 import BootstrapTables from "./tables/BootstrapTables";
+import UserTable from "./tables/UserTable";
 import Signin from "./Auth/Signin";
 import Signup from "./Auth/Signup";
 import ForgotPassword from "./Auth/ForgotPassword";
@@ -154,6 +155,7 @@ export default () => (
     <RouteWithSidebar exact path={Routes.MyProfile.path} component={MyProfile} />
     <RouteWithRole exact path={Routes.RoleManagement.path} component={RoleManagement} allowedRoles={["pemilik"]} />
     <RouteWithSidebar exact path={Routes.BootstrapTables.path} component={BootstrapTables} />
+    <RouteWithSidebar exact path={Routes.UserTable.path} component={UserTable} />
 
     {/* components */}
     <RouteWithSidebar exact path={Routes.Accordions.path} component={Accordion} />

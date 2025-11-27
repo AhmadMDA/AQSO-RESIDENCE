@@ -1,4 +1,3 @@
-
 export const Routes = {
     // pages
     Presentation: { path: "/Auth/sign-in" },
@@ -13,6 +12,7 @@ export const Routes = {
     RoleManagement: { path: "/role-management" },
     Upgrade: { path: "/upgrade" },
     BootstrapTables: { path: "/tables/bootstrap-tables" },
+    UserTable: { path: "/tables/user-table" },
     Billing: { path: "/Auth/billing" },
     Invoice: { path: "/Auth/invoice" },
     Lock: { path: "/Auth/lock" },

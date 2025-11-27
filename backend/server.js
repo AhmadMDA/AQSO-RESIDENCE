@@ -10,6 +10,7 @@ const PORT = process.env.PORT || 4000;
 const USERS_FILE = path.join(__dirname, 'users.json');
 const PROFILES_FILE = path.join(__dirname, 'profiles.json');
 const TRANSACTIONS_FILE = path.join(__dirname, 'transactions.json');
+const CUSTOMERS_FILE = path.join(__dirname, 'customers.json');
 const JWT_SECRET = process.env.JWT_SECRET || 'secret_dev_key_change_me';
 
 app.use(cors());
@@ -52,6 +53,19 @@ function readTransactions() {
 
 function writeTransactions(transactions) {
   fs.writeFileSync(TRANSACTIONS_FILE, JSON.stringify(transactions, null, 2));
+}
+
+function readCustomers() {
+  try {
+    const data = fs.readFileSync(CUSTOMERS_FILE, 'utf8');
+    return JSON.parse(data || '[]');
+  } catch (err) {
+    return [];
+  }
+}
+
+function writeCustomers(customers) {
+  fs.writeFileSync(CUSTOMERS_FILE, JSON.stringify(customers, null, 2));
 }
 
 app.get('/api/health', (req, res) => {
@@ -144,6 +158,56 @@ app.get('/api/transactions', (req, res) => {
   console.log('[GET /api/transactions] request from', req.ip);
   const transactions = readTransactions();
   res.json(transactions);
+});
+
+// Customers endpoints for User Table (separate from auth /api/users)
+app.get('/api/customers', (req, res) => {
+  const customers = readCustomers();
+  res.json(customers);
+});
+
+app.post('/api/customers', (req, res) => {
+  const payload = req.body || {};
+  const customers = readCustomers();
+  const nextId = customers.length > 0 ? Math.max(...customers.map(c => c.id || 0)) + 1 : 1;
+
+  const record = {
+    id: nextId,
+    tanggal: payload.tanggal || new Date().toISOString().slice(0,10),
+    nama: payload.nama || '',
+    alamat: payload.alamat || '',
+    no_telpon: payload.no_telpon || '',
+    type: payload.type || '',
+    harga: payload.harga != null ? payload.harga : 0,
+    no_rumah: payload.no_rumah || '',
+    keterangan: payload.keterangan || '',
+    lunas: !!payload.lunas
+  };
+  customers.push(record);
+  writeCustomers(customers);
+  res.status(201).json(record);
+});
+
+app.put('/api/customers/:id', (req, res) => {
+  const { id } = req.params;
+  const payload = req.body || {};
+  const customers = readCustomers();
+  const idx = customers.findIndex(c => String(c.id) === String(id));
+  if (idx === -1) return res.status(404).json({ message: 'Customer not found' });
+  const updated = { ...customers[idx], ...payload, id: customers[idx].id };
+  customers[idx] = updated;
+  writeCustomers(customers);
+  res.json(updated);
+});
+
+app.delete('/api/customers/:id', (req, res) => {
+  const { id } = req.params;
+  let customers = readCustomers();
+  const idx = customers.findIndex(c => String(c.id) === String(id));
+  if (idx === -1) return res.status(404).json({ message: 'Customer not found' });
+  const removed = customers.splice(idx, 1);
+  writeCustomers(customers);
+  res.json({ message: 'Deleted', customer: removed[0] });
 });
 
 app.post('/api/transactions', (req, res) => {

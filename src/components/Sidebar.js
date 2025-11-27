@@ -110,7 +110,7 @@ export default (props = {}) => {
               <NavItem title="AQSO RESIDENCE" link={Routes.Presentation.path} image={ReactHero} />
 
               <NavItem title="Overview" link={Routes.DashboardOverview.path} icon={faChartPie} />
-              <NavItem title="User Table" icon={faTable} link={Routes.BootstrapTables.path} />
+              <NavItem title="User Table" icon={faTable} link={Routes.UserTable.path} />
               <NavItem title="Transactions" icon={faHandHoldingUsd} link={Routes.Transactions.path} />
               {/* <NavItem title="Messages" link="#" icon={faInbox} /> */}
               {/* <NavItem title="Transactions" icon={faHandHoldingUsd} link={Routes.Transactions.path} /> */}
