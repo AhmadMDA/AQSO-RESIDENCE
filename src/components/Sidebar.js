@@ -8,10 +8,12 @@ import { faBook, faBoxOpen, faChartPie, faUser, faHandHoldingUsd, faSignOutAlt, 
 import { Nav, Badge, Image, Button, Dropdown, Accordion, Navbar } from '@themesberg/react-bootstrap';
 import { Link } from 'react-router-dom';
 
+
 import { Routes } from "../routes";
 import ThemesbergLogo from "../assets/img/themesberg.svg";
 import ReactHero from "../assets/img/technologies/react-hero-logo.svg";
 import ProfilePicture from "../assets/img/team/profile-picture-3.jpg";
+import LogoAQSO from "../assets/img/Gemini_Generated_Image_82909d82909d8290.png";
 
 export default (props = {}) => {
   const location = useLocation();
@@ -107,10 +109,17 @@ export default (props = {}) => {
               </Nav.Link>
             </div>
             <Nav className="flex-column pt-3 pt-md-0">
-              <NavItem title="AQSO RESIDENCE" link={Routes.Presentation.path} image={ReactHero} />
+             <NavItem
+              title="AQSO RESIDENCE"
+              link={Routes.Presentation.path}
+              image={LogoAQSO}
+              imageSize={80}
+            />
 
               <NavItem title="Overview" link={Routes.DashboardOverview.path} icon={faChartPie} />
               <NavItem title="User Table" icon={faTable} link={Routes.UserTable.path} />
+              <NavItem title="Data Kavling" icon={faMapPin} link={Routes.DataKavling.path} />
+              <NavItem title="Data Kas" icon={faBook} link={Routes.DataKas.path} />
               <NavItem title="Transactions" icon={faHandHoldingUsd} link={Routes.Transactions.path} />
               {/* <NavItem title="Messages" link="#" icon={faInbox} /> */}
               {/* <NavItem title="Transactions" icon={faHandHoldingUsd} link={Routes.Transactions.path} /> */}

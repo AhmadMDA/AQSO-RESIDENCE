@@ -1,1 +1,26 @@
-[]
+[
+  {
+    "id": 1,
+    "tanggal": "2025-11-27",
+    "nama": "ee",
+    "alamat": "eqe",
+    "no_telpon": "ee",
+    "type": "Type 35",
+    "harga": 333,
+    "no_rumah": "3",
+    "keterangan": "4",
+    "lunas": true
+  },
+  {
+    "id": 2,
+    "tanggal": "2025-11-27",
+    "nama": "ee",
+    "alamat": "eqe",
+    "no_telpon": "ee",
+    "type": "Type 35",
+    "harga": 333,
+    "no_rumah": "3",
+    "keterangan": "4",
+    "lunas": false
+  }
+]

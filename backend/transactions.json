@@ -2,45 +2,12 @@
   {
     "id": 1,
     "no_kwitansi": "001",
-    "diterima_dari": "afaf",
-    "untuk_pembayaran": "Uang Muka",
-    "ket_pembayaran": "Tunai",
-    "nama_marketing": "rrr",
-    "jumlah": 666,
-    "terbilang": "enam ratus enam puluh enam rupiah",
-    "tanggal": "2025-11-26"
-  },
-  {
-    "id": 2,
-    "no_kwitansi": "002",
-    "diterima_dari": "3",
-    "untuk_pembayaran": "Pemesanan Rumah",
-    "ket_pembayaran": "Tunai",
-    "nama_marketing": "ee",
-    "jumlah": 111,
-    "terbilang": "seratus sebelas rupiah",
-    "tanggal": "2025-11-26"
-  },
-  {
-    "id": 3,
-    "no_kwitansi": "003",
-    "diterima_dari": "afaf",
-    "untuk_pembayaran": "Pemesanan Rumah",
+    "diterima_dari": "ff",
+    "untuk_pembayaran": "Pemesanan Ruko",
     "ket_pembayaran": "Cek",
-    "nama_marketing": "rrr",
-    "jumlah": 222,
-    "terbilang": "dua ratus dua puluh dua rupiah",
-    "tanggal": "2025-11-26"
-  },
-  {
-    "id": 4,
-    "no_kwitansi": "004",
-    "diterima_dari": "4",
-    "untuk_pembayaran": "Tanda Jadi",
-    "ket_pembayaran": "Cek",
-    "nama_marketing": "4",
-    "jumlah": 4,
-    "terbilang": "empat rupiah",
+    "nama_marketing": "d",
+    "jumlah": 11111,
+    "terbilang": "sebelas ribu seratus sebelas rupiah",
     "tanggal": "2025-11-27"
   }
 ]

@@ -13,6 +13,8 @@ export const Routes = {
     Upgrade: { path: "/upgrade" },
     BootstrapTables: { path: "/tables/bootstrap-tables" },
     UserTable: { path: "/tables/user-table" },
+    DataKavling: { path: "/tables/data-kavling" },
+    DataKas: { path: "/tables/data-kas" },
     Billing: { path: "/Auth/billing" },
     Invoice: { path: "/Auth/invoice" },
     Lock: { path: "/Auth/lock" },

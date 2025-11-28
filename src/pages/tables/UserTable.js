@@ -30,7 +30,7 @@ export default () => {
     harga: '',
     no_rumah: '',
     keterangan: '',
-    lunas: false
+    lunas: 'Belum'
   });
 
   useEffect(() => {
@@ -49,7 +49,7 @@ export default () => {
 
   const handleOpen = () => {
     setEditingId(null);
-    setForm({ tanggal: new Date().toISOString().slice(0,10), nama: '', alamat: '', no_telpon: '', type: '', harga: '', no_rumah: '', keterangan: '', lunas: false });
+    setForm({ tanggal: new Date().toISOString().slice(0,10), nama: '', alamat: '', no_telpon: '', type: '', harga: '', no_rumah: '', keterangan: '', lunas: 'Belum' });
     setErrors({});
     setShowModal(true);
   };
@@ -65,7 +65,7 @@ export default () => {
       harga: u.harga != null ? String(u.harga) : '',
       no_rumah: u.no_rumah || '',
       keterangan: u.keterangan || '',
-      lunas: !!u.lunas
+      lunas: !!u.lunas ? 'Lunas' : 'Belum'
     });
     setErrors({});
     setShowModal(true);
@@ -78,8 +78,8 @@ export default () => {
   };
 
   const handleChange = (e) => {
-    const { name, value, type, checked } = e.target;
-    setForm(prev => ({ ...prev, [name]: type === 'checkbox' ? checked : value }));
+    const { name, value } = e.target;
+    setForm(prev => ({ ...prev, [name]: value }));
   };
 
   const validate = () => {
@@ -101,7 +101,7 @@ export default () => {
       harga: form.harga ? parseFloat(form.harga) : 0,
       no_rumah: form.no_rumah,
       keterangan: form.keterangan,
-      lunas: form.lunas
+      lunas: form.lunas === 'Lunas'
     };
 
     try {
@@ -195,7 +195,7 @@ export default () => {
 
   const handleExport = () => {
     if (!users || users.length === 0) { alert('Tidak ada data untuk diexport'); return; }
-    const wsData = [ ['ID','Tanggal','Nama','Alamat','No Telpon','Type','Harga','No Rumah','Keterangan','Lunas'], ...users.map(u => [u.id, u.tanggal, u.nama, u.alamat, u.no_telpon, u.type, u.harga, u.no_rumah, u.keterangan, u.lunas ? 'Ya' : 'Belum']) ];
+    const wsData = [ ['ID','Tanggal','Nama','Alamat','No Telpon','Type','Harga','No Rumah','Keterangan','Lunas'], ...users.map(u => [u.id, u.tanggal, u.nama, u.alamat, u.no_telpon, u.type, u.harga, u.no_rumah, u.keterangan, u.lunas ? 'Lunas' : 'Belum']) ];
     const ws = XLSX.utils.aoa_to_sheet(wsData);
     const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, 'Users'); ws['!cols'] = [{wch:5},{wch:12},{wch:20},{wch:25},{wch:15},{wch:12},{wch:12},{wch:12},{wch:20},{wch:8}]; XLSX.writeFile(wb, `users_${new Date().toISOString().slice(0,10)}.xlsx`);
   };
@@ -300,7 +300,21 @@ export default () => {
               <Col md={6}><Form.Group className="mb-3"><Form.Label>No Telpon</Form.Label><Form.Control name="no_telpon" value={form.no_telpon} onChange={handleChange} /></Form.Group></Col>
             </Row>
             <Row>
-              <Col md={4}><Form.Group className="mb-3"><Form.Label>Type</Form.Label><Form.Control name="type" value={form.type} onChange={handleChange} /></Form.Group></Col>
+              <Col md={4}><Form.Group className="mb-3"><Form.Label>Type <span className="text-danger">*</span>
+              <Form.Select
+                name="type"
+                value={form.type}
+                onChange={handleChange}
+                isInvalid={!!errors.type}
+                style={{ minWidth: '200px' }}>
+                  <option value="">Pilih...</option>
+                  <option value="Type 35">Type 35  </option>
+                  <option value="Type 55">Type 55  </option>
+                  <option value="Type 70">Type 70  </option>
+              </Form.Select>
+              </Form.Label>
+              
+              </Form.Group></Col>
               <Col md={4}><Form.Group className="mb-3"><Form.Label>Harga</Form.Label><Form.Control name="harga" type="number" value={form.harga} onChange={handleChange} /></Form.Group></Col>
               <Col md={4}><Form.Group className="mb-3"><Form.Label>No Rumah</Form.Label><Form.Control name="no_rumah" value={form.no_rumah} onChange={handleChange} /></Form.Group></Col>
             </Row>

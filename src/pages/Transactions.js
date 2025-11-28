@@ -3,31 +3,75 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCheck, faCog, faHome, faTrash, faEdit } from '@fortawesome/free-solid-svg-icons';
 import { Col, Row, Form, Button, ButtonGroup, Breadcrumb, Dropdown, Modal, Table, Card, Alert } from '@themesberg/react-bootstrap';
 import * as XLSX from 'xlsx';
+import LogoAQSO from "../assets/img/Gemini_Generated_Image_82909d82909d829.png";
 
 // CSS untuk print
 const printStyles = `
   @media print {
-    * {
+    body * {
       visibility: hidden;
     }
+    .modal,
+    .modal-dialog,
+    .modal-content,
     #printContent,
     #printContent * {
       visibility: visible;
     }
-    #printContent {
-      position: absolute;
-      left: 0;
-      top: 0;
-      width: 100%;
+    .modal {
+      position: absolute !important;
+      left: 0 !important;
+      top: 0 !important;
+      width: 100% !important;
+      height: 100% !important;
+      max-width: none !important;
+      margin: 0 !important;
+      padding: 0 !important;
+      opacity: 1 !important;
+      display: block !important;
+      background: white !important;
     }
-    body {
-      margin: 0;
-      padding: 0;
+    .modal-dialog {
+      max-width: none !important;
+      margin: 0 !important;
+      width: 100% !important;
+      height: 100% !important;
+    }
+    .modal-content {
+      border: none !important;
+      box-shadow: none !important;
+      height: 100% !important;
+      background: transparent !important;
+    }
+    .modal-header,
+    .modal-footer {
+      display: none !important;
+    }
+    .modal-body {
+      padding: 0 !important;
+      margin: 0 !important;
+      height: 100% !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      background: white !important;
+    }
+    #printContent {
+      position: relative !important;
+      width: 21cm !important;
+      height: 14.8cm !important;
+      margin: 0 auto !important;
+      background: #e4f2ff !important;
+      display: block !important;
+    }
+    #printContent-inner {
+      transform: none !important;
+      margin: 0 !important;
     }
   }
   @page {
-    margin: 0.5cm;
-    size: A4;
+    margin: 0;
+    size: 21cm 14.8cm;
   }
 `;
 
@@ -741,81 +785,110 @@ export default () => {
       </Modal>
 
       {/* MODAL PRINT KWITANSI */}
-      <Modal show={showPrintModal} onHide={handleClosePrint} size="lg">
+      <Modal show={showPrintModal} onHide={handleClosePrint} size="lg" className="print-modal">
         <Modal.Header closeButton>
           <Modal.Title>Print Kwitansi</Modal.Title>
         </Modal.Header>
 
-        <Modal.Body>
+        <Modal.Body style={{ padding: 0, display: 'flex', justifyContent: 'center', alignItems: 'center', background: '#f8f9fa' }}>
           {selectedTransaction && (
-            <div id="printContent" style={{ background: '#fff', fontFamily: 'Arial, sans-serif', color: '#111', padding: 0 }}>
-              {/* Header with diagonal gradients and logo */}
-              <div style={{ position: 'relative', height: 120, overflow: 'hidden' }}>
-                <div style={{ position: 'absolute', left: '-10%', top: '-30%', width: '60%', height: 300, background: 'linear-gradient(120deg,#06b6d4 0%,#2563eb 50%, #7c3aed 100%)', transform: 'skewX(-20deg)' }} />
-                <div style={{ position: 'absolute', left: -40, top: -10, width: 220, height: 220, background: 'linear-gradient(90deg,#07b3d6,#4f46e5)', opacity: 0.25, transform: 'rotate(-12deg)' }} />
-                <div style={{ position: 'absolute', right: 18, top: 12, width: 110, height: 110, borderRadius: 8, background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 2px 6px rgba(0,0,0,0.15)' }}>
-                  {/* Replace with actual logo image path if available */}
-                  <div style={{ width: 88, height: 88, borderRadius: 6, background: 'linear-gradient(135deg,#0ea5e9,#2563eb)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontWeight: 700 }}>LOGO</div>
-                </div>
-                <div style={{ position: 'relative', zIndex: 2, textAlign: 'center', paddingTop: 18 }}>
-                  <div style={{ fontSize: 36, fontWeight: 900, color: '#0b2b4a', letterSpacing: 2 }}>KWITANSI</div>
-                  <div style={{ fontSize: 12, color: '#0b2b4a', marginTop: 6 }}>AQSO RESIDENCE</div>
-                </div>
-              </div>
+            <div
+              id="printContent"
+              style={{
+                background: '#e4f2ff',
+                fontFamily: 'Arial, sans-serif',
+                color: '#0f1f3d',
+                padding: '20px',
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center'
+              }}
+            >
+              <div
+                style={{
+                  width: '21cm',
+                  height: '14.8cm',
+                  background: '#fff',
+                  boxShadow: '0 12px 45px rgba(0,0,0,0.18)',
+                  borderRadius: 10,
+                  overflow: 'hidden',
+                  position: 'relative'
+                }}
+                id="printContent-inner"
+              >
+                {/* background accents */}
+                <div style={{ position: 'absolute', top: -120, left: -80, width: 320, height: 320, background: 'rgba(0,150,255,0.15)', transform: 'rotate(-20deg)' }} />
+                <div style={{ position: 'absolute', bottom: -160, right: -140, width: 420, height: 420, background: 'rgba(15,98,254,0.08)', borderRadius: '50%' }} />
 
-              {/* Main body: left labels and right values with borders */}
-              <div style={{ display: 'flex', padding: '18px 28px 8px 28px', gap: 20 }}>
-                <div style={{ width: '34%', paddingTop: 6 }}>
-                  <div style={{ padding: '6px 0' }}><strong>No. Kwitansi :</strong></div>
-                  <div style={{ padding: '12px 0' }}><strong>SUDAH TERIMA DARI</strong></div>
-                  <div style={{ padding: '12px 0' }}><strong>UNTUK PEMBAYARAN</strong></div>
-                  <div style={{ padding: '12px 0' }}><strong>KET. PEMBAYARAN</strong></div>
-                  <div style={{ padding: '12px 0' }}><strong>NAMA MARKETING</strong></div>
-                  <div style={{ padding: '12px 0' }}><strong>JUMLAH</strong></div>
-                  <div style={{ padding: '12px 0' }}><strong>TERBILANG</strong></div>
-                </div>
-
-                <div style={{ flex: 1 }}>
-                  <div style={{ padding: '6px 10px', marginBottom: 6 }}>
-                    <span style={{ display: 'inline-block', width: '100%' }}>: {selectedTransaction.no_kwitansi}</span>
+                <div style={{ position: 'relative', zIndex: 2, padding: '20px 35px 15px 35px', height: '100%' }}>
+                  {/* header row */}
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <div style={{ fontSize: 14 }}>
+                      <div>No. Kwitansi :</div>
+                      <div style={{ fontWeight: 700, fontSize: 20, letterSpacing: 1 }}>{selectedTransaction.no_kwitansi || '-'}</div>
+                    </div>
+                    <div style={{ textAlign: 'center', flex: 1 }}>
+                      <div style={{ fontSize: 36, fontWeight: 900, letterSpacing: 6 }}>KWITANSI</div>
+                      <div style={{ fontSize: 12, marginTop: 2, letterSpacing: 3 }}>AQSO RESIDENCE</div>
+                    </div>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
+                      <img 
+                        src={LogoAQSO} 
+                        alt="AQSO RESIDENCE" 
+                        style={{ 
+                          width: 80, 
+                          height: 80,
+                          marginRight: '10px'
+                        }} 
+                      />
+                    </div>
                   </div>
 
-                  <div style={{ padding: '8px 10px', borderBottom: '1px solid #cfcfcf', marginBottom: 8 }}>{selectedTransaction.diterima_dari}</div>
-                  <div style={{ padding: '8px 10px', borderBottom: '1px solid #cfcfcf', marginBottom: 8 }}>{selectedTransaction.untuk_pembayaran}</div>
-                  <div style={{ padding: '8px 10px', borderBottom: '1px solid #cfcfcf', marginBottom: 8 }}>{selectedTransaction.ket_pembayaran}</div>
-                  <div style={{ padding: '8px 10px', borderBottom: '1px solid #cfcfcf', marginBottom: 8 }}>{selectedTransaction.nama_marketing}</div>
-
-                  <div style={{ padding: '8px 10px', borderBottom: '1px solid #cfcfcf', marginBottom: 8, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <div />
-                    <div style={{ fontWeight: 800 }}>Rp {selectedTransaction.jumlah.toLocaleString('id-ID')}</div>
+                  {/* body table style */}
+                  <div style={{ marginTop: 15, border: '2px solid #0f62fe', borderRadius: 6, padding: '10px 14px 4px 14px' }}>
+                    {[
+                      { label: 'SUDAH TERIMA DARI', value: selectedTransaction.diterima_dari || '-' },
+                      { label: 'UNTUK PEMBAYARAN', value: selectedTransaction.untuk_pembayaran || '-' },
+                      { label: 'KET. PEMBAYARAN', value: selectedTransaction.ket_pembayaran || '-' },
+                      { label: 'NAMA MARKETING', value: selectedTransaction.nama_marketing || '-' },
+                      {
+                        label: 'JUMLAH',
+                        value: `Rp ${selectedTransaction.jumlah?.toLocaleString('id-ID')}`,
+                        strong: true
+                      },
+                      { label: 'TERBILANG', value: selectedTransaction.terbilang || '-' }
+                    ].map((row, idx) => (
+                      <div
+                        key={row.label}
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          borderBottom: idx === 5 ? 'none' : '1px solid #d7e7ff',
+                          padding: '6px 4px',
+                          fontSize: idx === 4 ? 16 : 13
+                        }}
+                      >
+                        <div style={{ width: 200, fontWeight: 600 }}>{row.label}</div>
+                        <div style={{ width: 15, fontWeight: 600 }}>:</div>
+                        <div style={{ flex: 1, fontWeight: row.strong ? 700 : 500 }}>{row.value}</div>
+                      </div>
+                    ))}
                   </div>
 
-                  <div style={{ padding: '8px 10px', fontStyle: 'italic' }}>{selectedTransaction.terbilang}</div>
+                  {/* footer */}
+                  <div style={{ marginTop: 15, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
+                    <div style={{ fontSize: 10, color: '#123054', flex: 1 }}>
+                      <div style={{ fontWeight: 700, marginBottom: 4 }}>Catatan:</div>
+                      <div>- Rekening Pembayaran PT. Bank .........................................................</div>
+                      <div>- Sertakan Foto Bukti Transfer, Nama Customer, Blok Pembayaran / Angsuran</div>
+                      <div>- UTJ berlaku maksimal 10 hari dari tanggal kwitansi ini</div>
+                    </div>
+                    <div style={{ textAlign: 'center', width: 200, marginLeft: 20 }}>
+                      <div style={{ fontSize: 12 }}>................................/......../20......</div>
+                      <div style={{ marginTop: 40, borderTop: '1px solid #222', paddingTop: 2, fontSize: 11 }}>Marketing / Penerima</div>
+                    </div>
+                  </div>
                 </div>
-              </div>
-
-              {/* Signatures and footer notes */}
-              <div style={{ display: 'flex', justifyContent: 'space-between', padding: '18px 28px 28px 28px' }}>
-                <div style={{ textAlign: 'center' }}>
-                  <div style={{ height: 60 }} />
-                  <div>__________________________</div>
-                  <div style={{ marginTop: 6, fontSize: 12 }}>( Tanda Tangan )</div>
-                </div>
-
-                <div style={{ textAlign: 'center' }}>
-                  <div style={{ height: 60 }} />
-                  <div>__________________________</div>
-                  <div style={{ marginTop: 6, fontSize: 12 }}>( Penerima )</div>
-                </div>
-              </div>
-
-              <div style={{ padding: '0 28px 28px 28px', fontSize: 11, color: '#444' }}>
-                <div style={{ marginBottom: 6 }}><strong>Catatan</strong></div>
-                <ul style={{ marginTop: 6, marginLeft: 18 }}>
-                  <li>Rekening Pembayaran PT. Bank</li>
-                  <li>Sertakan Foto Bukti Transfer, Nama Customer, Blok Pembayaran/ Angsuran</li>
-                  <li>UTJ berlaku maksimal 10 Hari dari tanggal Kwitansi ini</li>
-                </ul>
               </div>
             </div>
           )}
@@ -843,7 +916,7 @@ export default () => {
                 window.print();
               }}
             >
-              🖨️ Print
+              🖨️ Print Sekarang
             </Button>
             <Button variant="secondary" onClick={handleClosePrint}>
               Tutup
