@@ -54,13 +54,13 @@
     "react-live": "^2.2.3",
     "react-router-dom": "^5.2.0",
     "react-router-hash-link": "^2.3.1",
-    "react-scripts": "3.4.3",
+    "react-scripts": "^5.0.1",
     "react-transition-group": "^4.4.1",
     "sass": "^1.50.0",
     "sequelize": "^6.37.7",
     "simplebar-react": "^2.3.0",
-    "xlsx": "^0.18.5",
-    "type": "module"
+    "type": "module",
+    "xlsx": "^0.18.5"
   },
   "scripts": {
     "start": "react-scripts start --openssl-legacy-provider",
@@ -87,6 +87,7 @@
     ]
   },
   "devDependencies": {
-    "gh-pages": "4.0.0"
+    "gh-pages": "^6.3.0",
+    "sequelize-cli": "^6.6.3"
   }
 }

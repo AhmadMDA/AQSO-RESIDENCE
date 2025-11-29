@@ -83,7 +83,7 @@ export default (props = {}) => {
     <>
       <Navbar expand={false} collapseOnSelect variant="dark" className="navbar-theme-primary px-4 d-md-none">
         <Navbar.Brand className="me-lg-5" as={Link} to={Routes.DashboardOverview.path}>
-          <Image src={ReactHero} className="navbar-brand-light" />
+          <Image src={LogoAQSO} className="navbar-brand-light" />
         </Navbar.Brand>
         <Navbar.Toggle as={Button} aria-controls="main-navbar" onClick={onCollapse}>
           <span className="navbar-toggler-icon" />
@@ -117,21 +117,14 @@ export default (props = {}) => {
             />
 
               <NavItem title="Overview" link={Routes.DashboardOverview.path} icon={faChartPie} />
-              <NavItem title="User Table" icon={faTable} link={Routes.UserTable.path} />
+              <NavItem title="Data Penghuni" icon={faTable} link={Routes.UserTable.path} />
               <NavItem title="Data Kavling" icon={faMapPin} link={Routes.DataKavling.path} />
               <NavItem title="Data Kas" icon={faBook} link={Routes.DataKas.path} />
-              <NavItem title="Transactions" icon={faHandHoldingUsd} link={Routes.Transactions.path} />
-              {/* <NavItem title="Messages" link="#" icon={faInbox} /> */}
-              {/* <NavItem title="Transactions" icon={faHandHoldingUsd} link={Routes.Transactions.path} /> */}
+              <NavItem title="Data Transaksi" icon={faHandHoldingUsd} link={Routes.Transactions.path} />
               {authUser && authUser.role === 'pemilik' && (
                 <NavItem title="Role" link={Routes.RoleManagement.path}  icon={faUser} />
               )}
-              {/* <div className="d-flex flex-column">
-                <CollapsableNavItem eventKey="tables/" title="Tables" icon={faTable}>
-                  <NavItem title="User Table" icon={faUser} link={Routes.BootstrapTables.path} />
-                  <NavItem title="Transactions" icon={faHandHoldingUsd} link={Routes.Transactions.path} />
-                </CollapsableNavItem>
-                </div> */}
+    
             </Nav>
           </div>
         </SimpleBar>

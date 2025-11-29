@@ -217,8 +217,8 @@ export default () => {
         <div className="btn-toolbar mb-2 mb-md-0">
           <ButtonGroup>
             <Button variant="outline-primary" size="sm" onClick={handleOpen}>+ Tambah data</Button>
-            <Button variant="outline-secondary" size="sm" onClick={triggerImportClick} style={{marginLeft:8}}>📤 Import Excel</Button>
-            <Button variant="outline-primary" size="sm" onClick={handleExport}>📥 Export data</Button>
+            <Button variant="outline-primary" size="sm" onClick={triggerImportClick} style={{marginLeft:8}}>📤 Import Excel</Button>
+            <Button variant="outline-primary" size="sm" onClick={handleExport} style={{marginLeft:8}}>📥 Export data</Button>
           </ButtonGroup>
           <input ref={fileInputRef} type="file" accept=".xlsx,.xls" style={{ display: 'none' }} onChange={handleFileUpload} />
         </div>

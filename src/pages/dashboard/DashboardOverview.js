@@ -161,34 +161,6 @@ export default () => {
 
   return (
     <>
-      <div className="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center py-4">
-
-        <Dropdown className="btn-toolbar">
-          <Dropdown.Toggle 
-            as={Button} 
-            variant="primary" 
-            size="sm" 
-            className="me-2"
-            onClick={handleUploadClick}
-          >
-            <FontAwesomeIcon icon={faCloudUploadAlt} className="me-2" /> 
-            Upload Files
-          </Dropdown.Toggle>
-        </Dropdown>
-
-        {/* Input file disembunyikan tapi tetap aktif */}
-        <input 
-          type="file" 
-          ref={fileInputRef} 
-          style={{ display: "none" }} 
-          onChange={handleFileChange}
-        />
-
-        <ButtonGroup>
-          <Button variant="outline-primary" size="sm">Share</Button>
-          <Button variant="outline-primary" size="sm">Export</Button>
-        </ButtonGroup>
-      </div>
 
       <Row className="justify-content-md-center">
         <Col xs={12} className="mb-4 d-none d-sm-block">
