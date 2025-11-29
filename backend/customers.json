@@ -22,5 +22,29 @@
     "no_rumah": "3",
     "keterangan": "4",
     "lunas": false
+  },
+  {
+    "id": 3,
+    "tanggal": "2025-11-29",
+    "nama": "ee",
+    "alamat": "eqe",
+    "no_telpon": "222",
+    "type": "Type 70",
+    "harga": 222,
+    "no_rumah": "22",
+    "keterangan": "222",
+    "lunas": false
+  },
+  {
+    "id": 4,
+    "tanggal": "2025-11-29",
+    "nama": "13",
+    "alamat": "eqe",
+    "no_telpon": "13",
+    "type": "Type 55",
+    "harga": 122,
+    "no_rumah": "13",
+    "keterangan": "13",
+    "lunas": false
   }
 ]

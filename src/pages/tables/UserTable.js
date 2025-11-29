@@ -207,11 +207,11 @@ export default () => {
       <div className="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center py-4">
         <div className="d-block mb-4 mb-md-0">
           <Breadcrumb className="d-none d-md-inline-block" listProps={{ className: "breadcrumb-dark breadcrumb-transparent" }}>
-            <Breadcrumb.Item>Users</Breadcrumb.Item>
-            <Breadcrumb.Item active>User Table</Breadcrumb.Item>
+            <Breadcrumb.Item>Penghuni</Breadcrumb.Item>
+            <Breadcrumb.Item active>Tabel Penghuni</Breadcrumb.Item>
           </Breadcrumb>
-          <h4>User Table</h4>
-          <p className="mb-0">Daftar user / pelanggan.</p>
+          <h4>Tabel Penghuni</h4>
+          <p className="mb-0">Daftar penghuni / pelanggan.</p>
         </div>
 
         <div className="btn-toolbar mb-2 mb-md-0">
@@ -283,7 +283,7 @@ export default () => {
 
       <Modal show={showModal} onHide={handleClose} size="lg">
         <Modal.Header closeButton>
-          <Modal.Title>{editingId ? 'Edit Data' : 'Tambah Data Baru'}</Modal.Title>
+          <Modal.Title>{editingId ? 'Edit Data Penghuni' : 'Tambah Penghuni Baru'}</Modal.Title>
         </Modal.Header>
         <Modal.Body>
           {Object.keys(errors).length > 0 && (

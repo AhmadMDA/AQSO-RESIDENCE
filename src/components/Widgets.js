@@ -85,7 +85,7 @@ export const CounterWidget = (props) => {
               <h5>{category}</h5>
               <h3 className="mb-1">{title}</h3>
             </div>
-            <small>{period}, <FontAwesomeIcon icon={faGlobeEurope} size="xs" /> WorldWide</small>
+            <small>{period}</small>
             <div className="small mt-2">
               <FontAwesomeIcon icon={percentageIcon} className={`${percentageColor} me-1`} />
               <span className={`${percentageColor} fw-bold`}>
@@ -102,6 +102,7 @@ export const CounterWidget = (props) => {
 export const CircleChartWidget = (props) => {
   const { title, data = [] } = props;
   const series = data.map(d => d.value);
+  const total = data.reduce((acc, cur) => acc + cur.value, 0) || 1;
 
   return (
     <Card border="light" className="shadow-sm">
@@ -112,13 +113,17 @@ export const CircleChartWidget = (props) => {
           </Col>
           <Col xs={12} xl={7} className="px-xl-0">
             <h5 className="mb-3">{title}</h5>
-
-            {data.map(d => (
-              <h6 key={`circle-element-${d.id}`} className="fw-normal text-gray">
-                <FontAwesomeIcon icon={d.icon} className={`icon icon-xs text-${d.color} w-20 me-1`} />
-                {` ${d.label} `}{`${d.value}%`}
-              </h6>
-            ))}
+            {data.map(d => {
+              const percent = Math.round((d.value / total) * 100);
+              return (
+                <h6 key={`circle-element-${d.id}`} className="fw-normal text-gray">
+                  <FontAwesomeIcon icon={d.icon} className={`icon icon-xs text-${d.color} w-20 me-1`} />
+                  {` ${d.label} `}
+                  {`${percent}% `}
+                  <span className="text-muted">({d.value})</span>
+                </h6>
+              );
+            })}
           </Col>
         </Row>
       </Card.Body>
@@ -304,7 +309,7 @@ export const BarChartWidget = (props) => {
 // };
 
 export const SalesValueWidget = (props) => {
-  const { title, value, percentage } = props;
+  const { title, value, percentage, dataChart } = props;
   const percentageIcon = percentage < 0 ? faAngleDown : faAngleUp;
   const percentageColor = percentage < 0 ? "text-danger" : "text-success";
 
@@ -312,58 +317,39 @@ export const SalesValueWidget = (props) => {
     <Card className="bg-secondary-alt shadow-sm">
       <Card.Header className="d-flex flex-row align-items-center flex-0">
         <div className="d-block">
-          <h5 className="fw-normal mb-2">
-            {title}
-          </h5>
-          <h3>${value}</h3>
+          <h5 className="fw-normal mb-2">{title}</h5>
+          <h3>{value}</h3>
           <small className="fw-bold mt-2">
-            <span className="me-2">Yesterday</span>
             <FontAwesomeIcon icon={percentageIcon} className={`${percentageColor} me-1`} />
-            <span className={percentageColor}>
-              {percentage}%
-            </span>
+            <span className={percentageColor}>{percentage}%</span>
           </small>
-        </div>
-        <div className="d-flex ms-auto">
-          <Button variant="secondary" size="sm" className="me-2">Month</Button>
-          <Button variant="primary" size="sm" className="me-3">Week</Button>
         </div>
       </Card.Header>
       <Card.Body className="p-2">
-        <SalesValueChart />
+        <SalesValueChart data={dataChart}/>
       </Card.Body>
     </Card>
   );
 };
 
 export const SalesValueWidgetPhone = (props) => {
-  const { title, value, percentage } = props;
+  const { title, value, percentage, dataChart } = props;
   const percentageIcon = percentage < 0 ? faAngleDown : faAngleUp;
   const percentageColor = percentage < 0 ? "text-danger" : "text-success";
-
   return (
     <Card className="bg-secondary-alt shadow-sm">
       <Card.Header className="d-md-flex flex-row align-items-center flex-0">
         <div className="d-block mb-3 mb-md-0">
-          <h5 className="fw-normal mb-2">
-            {title}
-          </h5>
-          <h3>${value}</h3>
+          <h5 className="fw-normal mb-2">{title}</h5>
+          <h3>{value}</h3>
           <small className="fw-bold mt-2">
-            <span className="me-2">Yesterday</span>
             <FontAwesomeIcon icon={percentageIcon} className={`${percentageColor} me-1`} />
-            <span className={percentageColor}>
-              {percentage}%
-            </span>
+            <span className={percentageColor}>{percentage}%</span>
           </small>
-        </div>
-        <div className="d-flex ms-auto">
-          <Button variant="secondary" size="sm" className="me-2">Month</Button>
-          <Button variant="primary" size="sm" className="me-3">Week</Button>
         </div>
       </Card.Header>
       <Card.Body className="p-2">
-        <SalesValueChartphone />
+        <SalesValueChartphone data={dataChart}/>
       </Card.Body>
     </Card>
   );

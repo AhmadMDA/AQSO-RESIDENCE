@@ -3,12 +3,8 @@ import React from "react";
 import Chartist from "react-chartist";
 import ChartistTooltip from 'chartist-plugin-tooltips-updated';
 
-export const SalesValueChart = () => {
-  const data = {
-    labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
-    series: [[1, 2, 2, 3, 3, 4, 3]]
-  };
-
+export const SalesValueChart = ({data}) => {
+  // data = { labels: ['Jan', 'Feb', ...], series: [[10000, 20000, ...]] }
   const options = {
     low: 0,
     showArea: true,
@@ -18,28 +14,18 @@ export const SalesValueChart = () => {
       showGrid: true
     },
     axisY: {
-      // On the y-axis start means left and end means right
       showGrid: false,
-      showLabel: false,
-      labelInterpolationFnc: value => `$${value / 1}k`
+      showLabel: true,
+      labelInterpolationFnc: value => 'Rp' + Number(value).toLocaleString('id-ID'),
     }
   };
-
-  const plugins = [
-    ChartistTooltip()
-  ]
-
+  const plugins = [ChartistTooltip()];
   return (
     <Chartist data={data} options={{...options, plugins}} type="Line" className="ct-series-g ct-double-octave" />
   );
 };
 
-export const SalesValueChartphone = () => {
-  const data = {
-    labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
-    series: [[1, 2, 2, 3, 3, 4, 3]]
-  };
-
+export const SalesValueChartphone = ({data}) => {
   const options = {
     low: 0,
     showArea: true,
@@ -49,17 +35,12 @@ export const SalesValueChartphone = () => {
       showGrid: true
     },
     axisY: {
-      // On the y-axis start means left and end means right
       showGrid: false,
-      showLabel: false,
-      labelInterpolationFnc: value => `$${value / 1}k`
+      showLabel: true,
+      labelInterpolationFnc: value => 'Rp' + Number(value).toLocaleString('id-ID'),
     }
   };
-
-  const plugins = [
-    ChartistTooltip()
-  ]
-
+  const plugins = [ChartistTooltip()];
   return (
     <Chartist data={data} options={{...options, plugins}} type="Line" className="ct-series-g ct-major-tenth" />
   );
