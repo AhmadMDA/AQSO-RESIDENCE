@@ -93,12 +93,6 @@ npm run build
 
 ---
 
-## 📝 Lisensi & Kredit
-
-Project menggunakan template **Volt React Dashboard** dari Themesberg.
-
----
-
 ## 👨‍💻 Pengembang
 
 **Maulana Akbar**  
