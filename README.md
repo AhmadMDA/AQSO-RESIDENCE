@@ -1,28 +1,99 @@
-# Volt - Free React Admin Dashboard Template
+# AQSO-RESIDENCE
 
-#### Preview
+Dashboard administrasi berbasis **React.js** yang dibangun menggunakan template **Volt React Dashboard**.  
+Project ini digunakan untuk pengelolaan data, monitoring, dan kebutuhan administrasi pada sistem AQSO-RESIDENCE.
 
- - [Demo](https://themewagon.github.io/volt-react-dashboard/#/dashboard/overview)
+---
 
-#### Download
- - [Download from ThemeWagon](https://themewagon.com/themes/volt-react/)
- 
- 
-## Getting Started
+## 🚀 Teknologi yang Digunakan
 
-Clone from GitHub 
+- **React.js**
+- **Bootstrap 5** (via Volt React Dashboard)
+- **React Router**
+- **Node.js + NPM/Yarn**
+- (Tambahkan jika ada library lainnya)
+
+---
+
+## 📦 Instalasi & Menjalankan Project
+
+### 1️⃣ Clone Repository
+
+```bash
+git clone https://github.com/AhmadMDA/AQSO-RESIDENCE.git
+cd AQSO-RESIDENCE
 ```
-https://github.com/themewagon/volt-react-dashboard.git
+
+### 2️⃣ Install Dependencies
+
+```bash
+npm install
 ```
 
-## Author
+### 3️⃣ Jalankan Development Server
 
-Design and code are completely written by Themesberg's design and development team.  
+```bash
+npm start
+```
 
+Aplikasi berjalan di:
 
-## License
+```
+http://localhost:3000
+```
 
- - Design and Code is Copyright &copy; [Themesberg](https://themesberg.com/)
- - Licensed under [MIT]
- - Distributed by [ThemeWagon](https://themewagon.com)
+---
 
+## 🗂️ Struktur Folder
+
+```
+AQSO-RESIDENCE/
+├── /public
+├── /src
+│   ├── /assets
+│   ├── /components
+│   ├── /pages
+│   ├── App.js
+│   └── index.js
+├── package.json
+└── README.md
+```
+
+---
+
+## ✨ Fitur Utama
+
+- Dashboard admin modern
+- Navigasi multi-halaman
+- UI dari Volt React Dashboard
+- Responsif dan ringan
+- Tambahan fitur sesuai implementasi:
+  - CRUD Data
+  - Autentikasi
+  - Manajemen User
+  - Integrasi API
+
+---
+
+## 📤 Workflow Git
+
+```bash
+git add .
+git commit -m "update"
+git push origin main
+```
+
+---
+
+## 🛠 Build untuk Production
+
+```bash
+npm run build
+```
+
+---
+
+## 👨‍💻 Pengembang
+
+**Maulana Akbar**  
+GitHub: https://github.com/AhmadMDA
