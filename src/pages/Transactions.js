@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useRef } from "react";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCheck, faCog, faHome, faTrash, faEdit } from '@fortawesome/free-solid-svg-icons';
@@ -8,6 +9,12 @@ import LogoAQSO from "../assets/img/Gemini_Generated_Image_82909d82909d829.png";
 // CSS untuk print
 const printStyles = `
   @media print {
+    body {
+      margin: 0 !important;
+      padding: 0 !important;
+      background: #ffffff !important;
+      overflow: hidden !important;
+    }
     body * {
       visibility: hidden;
     }
@@ -29,7 +36,7 @@ const printStyles = `
       padding: 0 !important;
       opacity: 1 !important;
       display: block !important;
-      background: white !important;
+      background: transparent !important;
     }
     .modal-dialog {
       max-width: none !important;
@@ -54,24 +61,27 @@ const printStyles = `
       display: flex !important;
       align-items: center !important;
       justify-content: center !important;
-      background: white !important;
+      background: transparent !important;
     }
+    /* area kwitansi, landscape ditempatkan di kertas potrait (sedikit lebih kecil) */
     #printContent {
       position: relative !important;
-      width: 21cm !important;
-      height: 14.8cm !important;
+      width: 20cm !important;     /* lebar kertas */
+      height: 30cm !important;    /* tinggi kertas (potrait) */
       margin: 0 auto !important;
-      background: #e4f2ff !important;
+      background: transparent !important;
       display: block !important;
     }
     #printContent-inner {
       transform: none !important;
-      margin: 0 !important;
+      margin: 1cm auto !important;
+      width: 20cm !important;   /* sedikit lebih kecil agar tidak terpotong */
+      height: 12cm !important;
     }
   }
   @page {
     margin: 0;
-    size: 21cm 14.8cm;
+    size: 22cm 30cm; /* potrait: lebar 22cm, tinggi 30cm */
   }
 `;
 
@@ -118,6 +128,22 @@ export default () => {
   const [editingId, setEditingId] = useState(null);
   const [selectedTransaction, setSelectedTransaction] = useState(null);
   const fileInputRef = useRef(null);
+  const [logoDataUrl, setLogoDataUrl] = useState(null);
+
+  useEffect(() => {
+    const convertLogoToDataUrl = async () => {
+      try {
+        const response = await fetch(LogoAQSO);
+        const blob = await response.blob();
+        const reader = new FileReader();
+        reader.onloadend = () => setLogoDataUrl(reader.result);
+        reader.readAsDataURL(blob);
+      } catch (err) {
+        console.warn('Tidak bisa memuat logo sebagai data URL', err);
+      }
+    };
+    convertLogoToDataUrl();
+  }, []);
   
   const [transactions, setTransactions] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
@@ -189,6 +215,179 @@ export default () => {
     setSelectedTransaction(transaction);
     setShowPrintModal(true);
     setShowPrintButtons(false);
+  };
+
+  const buildWordHtml = (transaction) => {
+    if (!transaction) return '';
+    const rows = [
+      { label: 'SUDAH TERIMA DARI', value: transaction.diterima_dari || '-' },
+      { label: 'UNTUK PEMBAYARAN', value: transaction.untuk_pembayaran || '-' },
+      { label: 'KET. PEMBAYARAN', value: transaction.ket_pembayaran || '-' },
+      { label: 'NAMA MARKETING', value: transaction.nama_marketing || '-' },
+      { label: 'JUMLAH', value: `Rp ${transaction.jumlah?.toLocaleString('id-ID') || '0'}`, strong: true },
+      { label: 'TERBILANG', value: transaction.terbilang || '-' }
+    ];
+
+    const rowsHtml = rows.map(row => `
+      <tr>
+        <td style="font-weight:600;padding:4px 8px;width:6cm;border-bottom:0.2mm solid #d7e7ff;">${row.label}</td>
+        <td style="font-weight:600;padding:4px 4px;width:0.5cm;border-bottom:0.2mm solid #d7e7ff;">:</td>
+        <td style="padding:4px 8px;border-bottom:0.2mm solid #d7e7ff;font-weight:${row.strong ? 700 : 500};">${row.value}</td>
+      </tr>
+    `).join('');
+
+    const logoSrc = logoDataUrl || LogoAQSO;
+
+    return `
+      <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
+        <head>
+          <meta charset="utf-8" />
+          <title>Kwitansi AQSO</title>
+          <style>
+            @page {
+              size: 12cm 20cm;
+              margin: 0;
+            }
+            html, body {
+              width: 20cm;
+              height: 12cm;
+            }
+            body {
+              margin: 0;
+              padding: 0;
+              font-family: Arial, sans-serif;
+              color: #0f1f3d;
+              background: #cbdff9;
+            }
+            .canvas {
+              width: 20cm;
+              height: 12cm;
+              background: #e4f2ff;
+              margin: 0 auto;
+              padding: 0.8cm;
+              box-sizing: border-box;
+              display: flex;
+              align-items: flex-start;
+              justify-content: center;
+            }
+            .card {
+              width: 20cm;
+              height: 12cm;
+              background: #fff;
+              border-radius: 0.5cm;
+              box-shadow: 0 12px 45px rgba(0,0,0,0.18);
+              position: relative;
+              overflow: hidden;
+              padding: 0.8cm 0.9cm;
+              box-sizing: border-box;
+            }
+            .card-bg-1 {
+              position: absolute;
+              top: -3cm;
+              left: -3cm;
+              width: 8cm;
+              height: 8cm;
+              background: rgba(0,150,255,0.15);
+              transform: rotate(-20deg);
+            }
+            .card-bg-2 {
+              position: absolute;
+              bottom: -4cm;
+              right: -4cm;
+              width: 10cm;
+              height: 10cm;
+              background: rgba(15,98,254,0.08);
+              border-radius: 50%;
+            }
+            .content {
+              position: relative;
+              z-index: 2;
+              height: 100%;
+            }
+            .header-table {
+              width: 100%;
+              table-layout: fixed;
+            }
+            .info-table {
+              width: 100%;
+              border: 0.3mm solid #0f62fe;
+              border-radius: 0.3cm;
+              padding: 0.2cm;
+              box-sizing: border-box;
+            }
+            .notes-row {
+              font-size: 9pt;
+              color: #123054;
+            }
+            .signature {
+              width: 6cm;
+              text-align: center;
+            }
+          </style>
+        </head>
+        <body>
+          <div class="canvas">
+            <div class="card">
+              <div class="card-bg-1"></div>
+              <div class="card-bg-2"></div>
+              <div class="content">
+                <table class="header-table">
+                  <tr>
+                    <td style="width:7cm;vertical-align:top;font-size:9pt;">
+                      <div>No. Kwitansi :</div>
+                      <div style="font-weight:700;font-size:14pt;letter-spacing:1px;">${transaction.no_kwitansi || '-'}</div>
+                    </td>
+                    <td style="text-align:center;">
+                      <div style="font-size:20pt;font-weight:900;letter-spacing:4px;">KWITANSI</div>
+                      <div style="font-size:9pt;letter-spacing:2px;">AQSO RESIDENCE</div>
+                    </td>
+                    <td style="width:6cm;text-align:right;vertical-align:top;">
+                      <img src="${logoSrc}" alt="AQSO RESIDENCE" style="width:2.5cm;height:2.5cm;object-fit:contain;" />
+                    </td>
+                  </tr>
+                </table>
+
+                <div class="info-table">
+                  <table style="width:100%;border-collapse:collapse;font-size:11pt;">
+                    ${rowsHtml}
+                  </table>
+                </div>
+
+                <table style="width:100%;margin-top:1cm;">
+                  <tr>
+                    <td class="notes-row">
+                      <div style="font-weight:700;margin-bottom:2mm;">Catatan:</div>
+                      <div>- Rekening Pembayaran PT. Bank .........................................................</div>
+                      <div>- Sertakan Foto Bukti Transfer, Nama Customer, Blok Pembayaran / Angsuran</div>
+                      <div>- UTJ berlaku maksimal 10 hari dari tanggal kwitansi ini</div>
+                    </td>
+                    <td class="signature">
+                      <div>................................/......../20......</div>
+                      <div style="margin-top:1.2cm;border-top:0.2mm solid #222;padding-top:1mm;font-size:9pt;">Marketing / Penerima</div>
+                    </td>
+                  </tr>
+                </table>
+              </div>
+            </div>
+          </div>
+        </body>
+      </html>
+    `;
+  };
+
+  const handleDownloadWord = () => {
+    if (!selectedTransaction) return;
+    const htmlContent = buildWordHtml(selectedTransaction);
+    const blob = new Blob(['\ufeff', htmlContent], { type: 'application/msword' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    const fileName = `kwitansi_${selectedTransaction.no_kwitansi || 'transaksi'}.doc`;
+    link.download = fileName;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
   };
 
   const handleClose = () => {
@@ -790,26 +989,25 @@ export default () => {
           <Modal.Title>Print Kwitansi</Modal.Title>
         </Modal.Header>
 
-        <Modal.Body style={{ padding: 0, display: 'flex', justifyContent: 'center', alignItems: 'center', background: '#f8f9fa' }}>
+        <Modal.Body style={{ padding: 0, display: 'flex', justifyContent: 'center', alignItems: 'center', background: 'transparent' }}>
           {selectedTransaction && (
             <div
               id="printContent"
               style={{
-                background: '#e4f2ff',
                 fontFamily: 'Arial, sans-serif',
-                color: '#0f1f3d',
                 padding: '20px',
                 display: 'flex',
                 justifyContent: 'center',
-                alignItems: 'center'
+                alignItems: 'center',
+                background: 'transparent'
               }}
             >
               <div
                 style={{
-                  width: '21cm',
-                  height: '14.8cm',
+                  width: '20cm',
+                  height: '12cm',
                   background: '#fff',
-                  boxShadow: '0 12px 45px rgba(0,0,0,0.18)',
+                  border: '1px solid #0f62fe',
                   borderRadius: 10,
                   overflow: 'hidden',
                   position: 'relative'
@@ -897,6 +1095,13 @@ export default () => {
         {!showPrintButtons && (
           <Modal.Footer>
             <Button 
+              variant="success"
+              onClick={handleDownloadWord}
+              disabled={!selectedTransaction}
+            >
+              ⬇️ Unduh Word
+            </Button>
+            <Button 
               variant="primary" 
               onClick={() => setShowPrintButtons(true)}
             >
@@ -910,6 +1115,13 @@ export default () => {
 
         {showPrintButtons && (
           <Modal.Footer>
+            <Button 
+              variant="success"
+              onClick={handleDownloadWord}
+              disabled={!selectedTransaction}
+            >
+              ⬇️ Unduh Word
+            </Button>
             <Button 
               variant="primary" 
               onClick={() => {

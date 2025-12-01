@@ -1,10 +1,10 @@
 export const Routes = {
     // pages
-    Presentation: { path: "/Auth/sign-in" },
-    Signin: { path: "/Auth/sign-in" },
-    Signup: { path: "/Auth/sign-up" },
-    ForgotPassword: { path: "/Auth/forgot-password" },
-    ResetPassword: { path: "/Auth/reset-password" },
+    Presentation: { path: "/sign-in" },
+    Signin: { path: "/sign-in" },
+    Signup: { path: "/sign-up" },
+    ForgotPassword: { path: "/forgot-password" },
+    ResetPassword: { path: "/reset-password" },
     DashboardOverview: { path: "/dashboard/overview" },
     Transactions: { path: "/transactions" },
     Settings: { path: "/settings" },
@@ -15,11 +15,11 @@ export const Routes = {
     UserTable: { path: "/tables/user-table" },
     DataKavling: { path: "/tables/data-kavling" },
     DataKas: { path: "/tables/data-kas" },
-    Billing: { path: "/Auth/billing" },
-    Invoice: { path: "/Auth/invoice" },
-    Lock: { path: "/Auth/lock" },
-    NotFound: { path: "/Auth/404" },
-    ServerError: { path: "/Auth/500" },
+    Billing: { path: "/billing" },
+    Invoice: { path: "/invoice" },
+    Lock: { path: "/lock" },
+    NotFound: { path: "/404" },
+    ServerError: { path: "/500" },
 
     // docs
     DocsOverview: { path: "/documentation/overview" },

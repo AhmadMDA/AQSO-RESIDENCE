@@ -28,7 +28,7 @@ router.get('/auth/:provider', (req, res) => {
   const mode = req.query.mode || 'signin'; // signin or signup
   
   if (!oauthProviders[provider]) {
-    return res.redirect(`${FRONTEND_URL}/Auth/sign-in?error=${encodeURIComponent('Provider tidak didukung')}`);
+    return res.redirect(`${FRONTEND_URL}/sign-in?error=${encodeURIComponent('Provider tidak didukung')}`);
   }
 
   // In production, redirect to actual OAuth provider
@@ -74,7 +74,7 @@ async function handleOAuthCallback(provider, email, name, mode, res) {
     }
     
     if (!user) {
-      return res.redirect(`${FRONTEND_URL}/Auth/sign-in?error=${encodeURIComponent('User tidak ditemukan')}`);
+      return res.redirect(`${FRONTEND_URL}/sign-in?error=${encodeURIComponent('User tidak ditemukan')}`);
     }
     
     // Generate JWT token
@@ -95,12 +95,12 @@ async function handleOAuthCallback(provider, email, name, mode, res) {
     
     // Redirect to frontend with token
     const userJson = encodeURIComponent(JSON.stringify({ email: user.email, role: user.role }));
-    const redirectPath = mode === 'signup' ? '/Auth/sign-up' : '/Auth/sign-in';
+    const redirectPath = mode === 'signup' ? '/sign-up' : '/sign-in';
     res.redirect(`${FRONTEND_URL}${redirectPath}?token=${token}&user=${userJson}`);
     
   } catch (error) {
     console.error('[OAuth] Error:', error);
-    const redirectPath = mode === 'signup' ? '/Auth/sign-up' : '/Auth/sign-in';
+    const redirectPath = mode === 'signup' ? '/sign-up' : '/sign-in';
     res.redirect(`${FRONTEND_URL}${redirectPath}?error=${encodeURIComponent('OAuth gagal: ' + error.message)}`);
   }
 }
@@ -114,7 +114,7 @@ router.get('/auth/:provider/callback', (req, res) => {
   // Exchange code for access token and get user info
   // Then call handleOAuthCallback with real user data
   
-  res.redirect(`${FRONTEND_URL}/Auth/sign-in?error=${encodeURIComponent('OAuth callback not fully implemented')}`);
+  res.redirect(`${FRONTEND_URL}/sign-in?error=${encodeURIComponent('OAuth callback not fully implemented')}`);
 });
 
 module.exports = router;
