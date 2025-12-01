@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faAngleLeft, faEnvelope, faUnlockAlt } from "@fortawesome/free-solid-svg-icons";
-import { faFacebookF, faGithub, faTwitter } from "@fortawesome/free-brands-svg-icons";
+import { faFacebookF, faGithub, faTwitter, faGoogle, faMicrosoft, faYahoo } from "@fortawesome/free-brands-svg-icons";
 import { Col, Row, Form, Card, Button, FormCheck, Container, InputGroup, Alert } from '@themesberg/react-bootstrap';
 import { Link, useHistory } from 'react-router-dom';
 
@@ -15,14 +15,32 @@ export default () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    // nothing here for backend mode
-  }, []);
+    // Check for OAuth callback
+    const urlParams = new URLSearchParams(window.location.search);
+    const token = urlParams.get('token');
+    const error = urlParams.get('error');
+    
+    if (token) {
+      const user = urlParams.get('user');
+      localStorage.setItem('authToken', token);
+      if (user) {
+        localStorage.setItem('authUser', user);
+      }
+      setMessage({ type: 'success', text: 'Login berhasil! Email konfirmasi telah dikirim.' });
+      setTimeout(() => history.push(Routes.DashboardOverview.path), 1500);
+    } else if (error) {
+      setMessage({ type: 'danger', text: decodeURIComponent(error) });
+    }
+  }, [history]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
     setMessage(null);
+    setIsLoading(true);
+    
     fetch('http://localhost:4000/api/login', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -36,12 +54,22 @@ export default () => {
       return res.json();
     })
     .then(data => {
-      // Save token and user
       localStorage.setItem('authToken', data.token);
       localStorage.setItem('authUser', JSON.stringify(data.user));
-      history.push(Routes.DashboardOverview.path);
+      setMessage({ type: 'success', text: 'Login berhasil!' });
+      setTimeout(() => history.push(Routes.DashboardOverview.path), 1000);
     })
-    .catch(err => setMessage({ type: 'danger', text: err.message }));
+    .catch(err => setMessage({ type: 'danger', text: err.message }))
+    .finally(() => setIsLoading(false));
+  };
+
+  const handleEmailProviderLogin = (provider) => {
+    setMessage(null);
+    setIsLoading(true);
+    
+    // Redirect to OAuth provider
+    const backendUrl = 'http://localhost:4000';
+    window.location.href = `${backendUrl}/api/auth/${provider}`;
   };
 
   return (
@@ -90,21 +118,44 @@ export default () => {
                   {message && (
                     <Alert variant={message.type} className="mb-3">{message.text}</Alert>
                   )}
-                  <Button variant="primary" type="submit" className="w-100">Sign In</Button>
+                  <Button variant="primary" type="submit" className="w-100" disabled={isLoading}>
+                    {isLoading ? 'Signing in...' : 'Sign In'}
+                  </Button>
                 </Form>
 
                 <div className="mt-3 mb-4 text-center">
-                  <span className="fw-normal">or login with</span>
+                  <span className="fw-normal">or login with email provider</span>
                 </div>
-                <div className="d-flex justify-content-center my-4">
-                  <Button variant="outline-light" className="btn-icon-only btn-pill text-facebook me-2">
-                    <FontAwesomeIcon icon={faFacebookF} />
+                <div className="d-flex justify-content-center my-4 flex-wrap gap-2">
+                  <Button 
+                    variant="outline-light" 
+                    className="btn-icon-only btn-pill me-2"
+                    style={{ color: '#DB4437', borderColor: '#DB4437' }}
+                    onClick={() => handleEmailProviderLogin('google')}
+                    disabled={isLoading}
+                    title="Sign in with Google"
+                  >
+                    <FontAwesomeIcon icon={faGoogle} />
                   </Button>
-                  <Button variant="outline-light" className="btn-icon-only btn-pill text-twitter me-2">
-                    <FontAwesomeIcon icon={faTwitter} />
+                  <Button 
+                    variant="outline-light" 
+                    className="btn-icon-only btn-pill me-2"
+                    style={{ color: '#00A4EF', borderColor: '#00A4EF' }}
+                    onClick={() => handleEmailProviderLogin('microsoft')}
+                    disabled={isLoading}
+                    title="Sign in with Microsoft"
+                  >
+                    <FontAwesomeIcon icon={faMicrosoft} />
                   </Button>
-                  <Button variant="outline-light" className="btn-icon-only btn-pil text-dark">
-                    <FontAwesomeIcon icon={faGithub} />
+                  <Button 
+                    variant="outline-light" 
+                    className="btn-icon-only btn-pill"
+                    style={{ color: '#6001D2', borderColor: '#6001D2' }}
+                    onClick={() => handleEmailProviderLogin('yahoo')}
+                    disabled={isLoading}
+                    title="Sign in with Yahoo"
+                  >
+                    <FontAwesomeIcon icon={faYahoo} />
                   </Button>
                 </div>
                 <div className="d-flex justify-content-center align-items-center mt-4">

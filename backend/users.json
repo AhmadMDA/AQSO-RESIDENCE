@@ -8,5 +8,10 @@
     "email": "pemilik@pemilik.com",
     "password": "$2b$10$LUxen38VBzumwEw73EDcwuPwkyL/kUtlFVRvEdHUdISJ5SW6ukWei",
     "role": "pemilik"
+  },
+  {
+    "email": "akbar.maulanadani@gmail.com",
+    "password": "$2b$10$dgRB/dYzn5VloXsAaGhGSO.uMEFjyj.9v5MypXQYNLkCMnGGhOM7a",
+    "role": "pemilik"
   }
 ]

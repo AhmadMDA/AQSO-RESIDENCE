@@ -1,8 +1,15 @@
-// import {Sequelize, sequelize} from "sequelize";
+const { Sequelize } = require('sequelize');
 
-// const db = new Sequelize('AQSO_db','root','',{
-//     host: "localhost",
-//     dialect: "mysql"
-// });
+const sequelize = new Sequelize('aqso_db', 'root', '', {
+  host: 'localhost',
+  dialect: 'mysql',
+  logging: false,
+  pool: {
+    max: 5,
+    min: 0,
+    acquire: 30000,
+    idle: 10000
+  }
+});
 
-// export default db;
+module.exports = sequelize;

@@ -1,8 +1,8 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faAngleLeft, faEnvelope, faUnlockAlt } from "@fortawesome/free-solid-svg-icons";
-import { faFacebookF, faGithub, faTwitter } from "@fortawesome/free-brands-svg-icons";
+import { faFacebookF, faGithub, faTwitter, faGoogle, faMicrosoft, faYahoo } from "@fortawesome/free-brands-svg-icons";
 import { Col, Row, Form, Card, Button, FormCheck, Container, InputGroup, Alert } from '@themesberg/react-bootstrap';
 import { Link, useHistory } from 'react-router-dom';
 
@@ -16,10 +16,31 @@ export default () => {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [message, setMessage] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    // Check for OAuth callback
+    const urlParams = new URLSearchParams(window.location.search);
+    const token = urlParams.get('token');
+    const error = urlParams.get('error');
+    
+    if (token) {
+      const user = urlParams.get('user');
+      localStorage.setItem('authToken', token);
+      if (user) {
+        localStorage.setItem('authUser', user);
+      }
+      setMessage({ type: 'success', text: 'Registrasi berhasil! Email konfirmasi telah dikirim.' });
+      setTimeout(() => history.push(Routes.DashboardOverview.path), 1500);
+    } else if (error) {
+      setMessage({ type: 'danger', text: decodeURIComponent(error) });
+    }
+  }, [history]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
     setMessage(null);
+    
     if (!email || !password || !confirmPassword) {
       setMessage({ type: 'danger', text: 'Lengkapi semua field.' });
       return;
@@ -29,10 +50,12 @@ export default () => {
       return;
     }
 
+    setIsLoading(true);
+    
     fetch('http://localhost:4000/api/register', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, password, role: 'pemilik' })
+      body: JSON.stringify({ email, password, role: 'admin' })
     })
     .then(async res => {
       if (!res.ok) {
@@ -43,24 +66,33 @@ export default () => {
     })
     .then(() => {
       setMessage({ type: 'success', text: 'Akun berhasil dibuat. Silakan login.' });
-      setTimeout(() => history.push(Routes.Signin.path), 1000);
+      setTimeout(() => history.push(Routes.Signin.path), 1500);
     })
     .catch(err => {
-      // Fallback: jika backend tidak tersedia, simpan user di localStorage
       try {
         const users = JSON.parse(localStorage.getItem('users') || '[]');
         if (users.find(u => u.email === email)) {
           setMessage({ type: 'danger', text: 'Email sudah terdaftar (lokal).' });
           return;
         }
-        users.push({ email, password, role: 'pemilik' });
+        users.push({ email, password, role: 'admin' });
         localStorage.setItem('users', JSON.stringify(users));
         setMessage({ type: 'warning', text: 'Server tidak respons. Akun disimpan secara lokal.' });
-        setTimeout(() => history.push(Routes.Signin.path), 1000);
+        setTimeout(() => history.push(Routes.Signin.path), 1500);
       } catch (e) {
         setMessage({ type: 'danger', text: err.message });
       }
-    });
+    })
+    .finally(() => setIsLoading(false));
+  };
+
+  const handleEmailProviderSignup = (provider) => {
+    setMessage(null);
+    setIsLoading(true);
+    
+    // Redirect to OAuth provider
+    const backendUrl = 'http://localhost:4000';
+    window.location.href = `${backendUrl}/api/auth/${provider}?mode=signup`;
   };
   return (
     <main>
@@ -115,23 +147,44 @@ export default () => {
                     </FormCheck.Label>
                   </FormCheck>
 
-                  <Button variant="primary" type="submit" className="w-100">
-                    Sign up
+                  <Button variant="primary" type="submit" className="w-100" disabled={isLoading}>
+                    {isLoading ? 'Creating account...' : 'Sign up'}
                   </Button>
                 </Form>
 
                 <div className="mt-3 mb-4 text-center">
-                  <span className="fw-normal">or</span>
+                  <span className="fw-normal">or sign up with email provider</span>
                 </div>
-                <div className="d-flex justify-content-center my-4">
-                  <Button variant="outline-light" className="btn-icon-only btn-pill text-facebook me-2">
-                    <FontAwesomeIcon icon={faFacebookF} />
+                <div className="d-flex justify-content-center my-4 flex-wrap gap-2">
+                  <Button 
+                    variant="outline-light" 
+                    className="btn-icon-only btn-pill me-2"
+                    style={{ color: '#DB4437', borderColor: '#DB4437' }}
+                    onClick={() => handleEmailProviderSignup('google')}
+                    disabled={isLoading}
+                    title="Sign up with Google"
+                  >
+                    <FontAwesomeIcon icon={faGoogle} />
                   </Button>
-                  <Button variant="outline-light" className="btn-icon-only btn-pill text-twitter me-2">
-                    <FontAwesomeIcon icon={faTwitter} />
+                  <Button 
+                    variant="outline-light" 
+                    className="btn-icon-only btn-pill me-2"
+                    style={{ color: '#00A4EF', borderColor: '#00A4EF' }}
+                    onClick={() => handleEmailProviderSignup('microsoft')}
+                    disabled={isLoading}
+                    title="Sign up with Microsoft"
+                  >
+                    <FontAwesomeIcon icon={faMicrosoft} />
                   </Button>
-                  <Button variant="outline-light" className="btn-icon-only btn-pil text-dark">
-                    <FontAwesomeIcon icon={faGithub} />
+                  <Button 
+                    variant="outline-light" 
+                    className="btn-icon-only btn-pill"
+                    style={{ color: '#6001D2', borderColor: '#6001D2' }}
+                    onClick={() => handleEmailProviderSignup('yahoo')}
+                    disabled={isLoading}
+                    title="Sign up with Yahoo"
+                  >
+                    <FontAwesomeIcon icon={faYahoo} />
                   </Button>
                 </div>
                 <div className="d-flex justify-content-center align-items-center mt-4">
