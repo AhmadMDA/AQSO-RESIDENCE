@@ -6,7 +6,7 @@ import { Col, Row, Form, Button, ButtonGroup, Breadcrumb, Dropdown, Modal, Table
 import * as XLSX from 'xlsx';
 import LogoAQSO from "../assets/img/Gemini_Generated_Image_82909d82909d829.png";
 
-// CSS untuk print
+// CSS untuk print - optimized for A4 paper (portrait)
 const printStyles = `
   @media print {
     body {
@@ -50,8 +50,7 @@ const printStyles = `
       height: 100% !important;
       background: transparent !important;
     }
-    .modal-header,
-    .modal-footer {
+    .modal-header {
       display: none !important;
     }
     .modal-body {
@@ -59,29 +58,37 @@ const printStyles = `
       margin: 0 !important;
       height: 100% !important;
       display: flex !important;
-      align-items: center !important;
-      justify-content: center !important;
+      align-items: flex-start !important;
+      justify-content: flex-start !important;
       background: transparent !important;
     }
-    /* area kwitansi, landscape ditempatkan di kertas potrait (sedikit lebih kecil) */
     #printContent {
       position: relative !important;
-      width: 20cm !important;     /* lebar kertas */
-      height: 30cm !important;    /* tinggi kertas (potrait) */
-      margin: 0 auto !important;
+      top: 0 !important;
+      left: 0 !important;
+      width: 21cm !important;
+      min-height: 8.5cm !important;
+      margin: 0 !important;
+      padding: 0 !important;
       background: transparent !important;
       display: block !important;
     }
     #printContent-inner {
-      transform: none !important;
-      margin: 1cm auto !important;
-      width: 20cm !important;   /* sedikit lebih kecil agar tidak terpotong */
-      height: 12cm !important;
+      width: 21cm !important;
+      height: auto !important;
+      min-height: 8cm !important;
+      margin: 0 !important;
+      padding: 0 !important;
+      background: #fff !important;
+      border: 1.2px solid #0f62fe !important;
+      border-radius: 0 !important;
+      box-sizing: border-box !important;
+      overflow: hidden !important;
     }
   }
   @page {
     margin: 0;
-    size: 22cm 30cm; /* potrait: lebar 22cm, tinggi 30cm */
+    size: A4 portrait;
   }
 `;
 
@@ -230,9 +237,9 @@ export default () => {
 
     const rowsHtml = rows.map(row => `
       <tr>
-        <td style="font-weight:600;padding:4px 8px;width:6cm;border-bottom:0.2mm solid #d7e7ff;">${row.label}</td>
-        <td style="font-weight:600;padding:4px 4px;width:0.5cm;border-bottom:0.2mm solid #d7e7ff;">:</td>
-        <td style="padding:4px 8px;border-bottom:0.2mm solid #d7e7ff;font-weight:${row.strong ? 700 : 500};">${row.value}</td>
+        <td style="font-weight:600;padding:8px 12px;width:7cm;border-bottom:0.2mm solid #d7e7ff;font-size:12pt;">${row.label}</td>
+        <td style="font-weight:600;padding:8px 6px;width:0.6cm;border-bottom:0.2mm solid #d7e7ff;font-size:12pt;">:</td>
+        <td style="padding:8px 12px;border-bottom:0.2mm solid #d7e7ff;font-weight:${row.strong ? 700 : 500};font-size:12pt;">${row.value}</td>
       </tr>
     `).join('');
 
@@ -243,14 +250,14 @@ export default () => {
         <head>
           <meta charset="utf-8" />
           <title>Kwitansi AQSO</title>
-          <style>
+            <style>
             @page {
-              size: 12cm 20cm;
-              margin: 0;
+              size: A4 portrait;
+              margin: 1cm;
             }
             html, body {
-              width: 20cm;
-              height: 12cm;
+              width: 19cm;
+              height: 27.7cm;
             }
             body {
               margin: 0;
@@ -260,42 +267,42 @@ export default () => {
               background: #cbdff9;
             }
             .canvas {
-              width: 20cm;
-              height: 12cm;
+              width: 19cm;
+              height: 27.7cm;
               background: #e4f2ff;
               margin: 0 auto;
-              padding: 0.8cm;
+              padding: 1cm;
               box-sizing: border-box;
               display: flex;
               align-items: flex-start;
               justify-content: center;
             }
             .card {
-              width: 20cm;
-              height: 12cm;
+              width: 17cm;
+              height: 25.7cm;
               background: #fff;
               border-radius: 0.5cm;
               box-shadow: 0 12px 45px rgba(0,0,0,0.18);
               position: relative;
               overflow: hidden;
-              padding: 0.8cm 0.9cm;
+              padding: 1.2cm 1.5cm;
               box-sizing: border-box;
             }
             .card-bg-1 {
               position: absolute;
-              top: -3cm;
-              left: -3cm;
-              width: 8cm;
-              height: 8cm;
+              top: -4cm;
+              left: -4cm;
+              width: 10cm;
+              height: 10cm;
               background: rgba(0,150,255,0.15);
               transform: rotate(-20deg);
             }
             .card-bg-2 {
               position: absolute;
-              bottom: -4cm;
-              right: -4cm;
-              width: 10cm;
-              height: 10cm;
+              bottom: -5cm;
+              right: -5cm;
+              width: 12cm;
+              height: 12cm;
               background: rgba(15,98,254,0.08);
               border-radius: 50%;
             }
@@ -310,17 +317,19 @@ export default () => {
             }
             .info-table {
               width: 100%;
-              border: 0.3mm solid #0f62fe;
-              border-radius: 0.3cm;
-              padding: 0.2cm;
+              border: 0.4mm solid #0f62fe;
+              border-radius: 0.4cm;
+              padding: 0.4cm;
               box-sizing: border-box;
+              margin-top: 0.8cm;
             }
             .notes-row {
-              font-size: 9pt;
+              font-size: 11pt;
               color: #123054;
+              line-height: 1.6;
             }
             .signature {
-              width: 6cm;
+              width: 7cm;
               text-align: center;
             }
           </style>
@@ -333,37 +342,37 @@ export default () => {
               <div class="content">
                 <table class="header-table">
                   <tr>
-                    <td style="width:7cm;vertical-align:top;font-size:9pt;">
-                      <div>No. Kwitansi :</div>
-                      <div style="font-weight:700;font-size:14pt;letter-spacing:1px;">${transaction.no_kwitansi || '-'}</div>
+                    <td style="width:7cm;vertical-align:top;font-size:11pt;">
+                      <div style="margin-bottom:0.3cm;">No. Kwitansi :</div>
+                      <div style="font-weight:700;font-size:18pt;letter-spacing:1.5px;">${transaction.no_kwitansi || '-'}</div>
                     </td>
                     <td style="text-align:center;">
-                      <div style="font-size:20pt;font-weight:900;letter-spacing:4px;">KWITANSI</div>
-                      <div style="font-size:9pt;letter-spacing:2px;">AQSO RESIDENCE</div>
+                      <div style="font-size:28pt;font-weight:900;letter-spacing:6px;margin-bottom:0.2cm;">KWITANSI</div>
+                      <div style="font-size:12pt;letter-spacing:3px;">AQSO RESIDENCE</div>
                     </td>
-                    <td style="width:6cm;text-align:right;vertical-align:top;">
-                      <img src="${logoSrc}" alt="AQSO RESIDENCE" style="width:2.5cm;height:2.5cm;object-fit:contain;" />
+                    <td style="width:7cm;text-align:right;vertical-align:top;">
+                      <img src="${logoSrc}" alt="AQSO RESIDENCE" style="width:3.5cm;height:3.5cm;object-fit:contain;" />
                     </td>
                   </tr>
                 </table>
 
                 <div class="info-table">
-                  <table style="width:100%;border-collapse:collapse;font-size:11pt;">
+                  <table style="width:100%;border-collapse:collapse;font-size:13pt;">
                     ${rowsHtml}
                   </table>
                 </div>
 
-                <table style="width:100%;margin-top:1cm;">
+                <table style="width:100%;margin-top:1.5cm;">
                   <tr>
                     <td class="notes-row">
-                      <div style="font-weight:700;margin-bottom:2mm;">Catatan:</div>
-                      <div>- Rekening Pembayaran PT. Bank .........................................................</div>
-                      <div>- Sertakan Foto Bukti Transfer, Nama Customer, Blok Pembayaran / Angsuran</div>
+                      <div style="font-weight:700;margin-bottom:0.4cm;font-size:12pt;">Catatan:</div>
+                      <div style="margin-bottom:0.2cm;">- Rekening Pembayaran PT. Bank .........................................................</div>
+                      <div style="margin-bottom:0.2cm;">- Sertakan Foto Bukti Transfer, Nama Customer, Blok Pembayaran / Angsuran</div>
                       <div>- UTJ berlaku maksimal 10 hari dari tanggal kwitansi ini</div>
                     </td>
                     <td class="signature">
-                      <div>................................/......../20......</div>
-                      <div style="margin-top:1.2cm;border-top:0.2mm solid #222;padding-top:1mm;font-size:9pt;">Marketing / Penerima</div>
+                      <div style="font-size:13pt;margin-bottom:0.3cm;">................................/......../20......</div>
+                      <div style="margin-top:2cm;border-top:0.3mm solid #222;padding-top:0.2cm;font-size:11pt;">Marketing / Penerima</div>
                     </td>
                   </tr>
                 </table>
@@ -912,19 +921,21 @@ export default () => {
               <Col md={6}>
                 <Form.Group className="mb-3">
                   <Form.Label>Untuk Pembayaran <span className="text-danger">*</span></Form.Label>
-                  <Form.Select
+                  <Form.Control
                     name="untuk_pembayaran"
                     value={form.untuk_pembayaran}
                     onChange={handleChange}
                     isInvalid={!!errors.untuk_pembayaran}
-                  >
-                    <option value="">Pilih...</option>
-                    <option value="Pemesanan Rumah">Pemesanan Rumah</option>
-                    <option value="Pemesanan Ruko">Pemesanan Ruko</option>
-                    <option value="Tanda Jadi">Tanda Jadi</option>
-                    <option value="Uang Muka">Uang Muka</option>
-                    <option value="Lain-lain">Lain-lain</option>
-                  </Form.Select>
+                    placeholder="Ketik atau pilih dari dropdown"
+                    list="pembayaran-options"
+                  />
+                  <datalist id="pembayaran-options">
+                    <option value="Pemesanan Rumah" />
+                    <option value="Pemesanan Ruko" />
+                    <option value="Tanda Jadi" />
+                    <option value="Uang Muka" />
+                    <option value="Lain-lain" />
+                  </datalist>
                   {errors.untuk_pembayaran && <Form.Control.Feedback type="invalid">{errors.untuk_pembayaran}</Form.Control.Feedback>}
                 </Form.Group>
               </Col>
@@ -989,101 +1000,101 @@ export default () => {
           <Modal.Title>Print Kwitansi</Modal.Title>
         </Modal.Header>
 
-        <Modal.Body style={{ padding: 0, display: 'flex', justifyContent: 'center', alignItems: 'center', background: 'transparent' }}>
+        <Modal.Body style={{ padding: 0, display: 'flex', justifyContent: 'flex-start', alignItems: 'flex-start', background: 'transparent' }}>
           {selectedTransaction && (
             <div
               id="printContent"
               style={{
                 fontFamily: 'Arial, sans-serif',
-                padding: '20px',
-                display: 'flex',
-                justifyContent: 'center',
-                alignItems: 'center',
-                background: 'transparent'
+                margin: 0,
+                padding: 0,
+                width: '21cm',
+                minHeight: '8.5cm',
+                background: 'transparent',
+                display: 'block',
+                position: 'relative',
+                left: 0,
+                top: 0
               }}
             >
               <div
+                id="printContent-inner"
                 style={{
-                  width: '20cm',
-                  height: '12cm',
+                  width: '21cm',
+                  minHeight: '8cm',
+                  margin: 0,
+                  padding: 0,
                   background: '#fff',
-                  border: '1px solid #0f62fe',
-                  borderRadius: 10,
+                  border: '1.2px solid #0f62fe',
+                  borderRadius: 0,
+                  boxSizing: 'border-box',
                   overflow: 'hidden',
                   position: 'relative'
                 }}
-                id="printContent-inner"
               >
-                {/* background accents */}
-                <div style={{ position: 'absolute', top: -120, left: -80, width: 320, height: 320, background: 'rgba(0,150,255,0.15)', transform: 'rotate(-20deg)' }} />
-                <div style={{ position: 'absolute', bottom: -160, right: -140, width: 420, height: 420, background: 'rgba(15,98,254,0.08)', borderRadius: '50%' }} />
+                {/* accents background bisa tipis */}
+                <div style={{ position: 'absolute', top: -55, left: -55, width: 270, height: 120, background: 'rgba(0,150,255,0.09)', transform: 'rotate(-15deg)' }} />
+                <div style={{ position: 'absolute', bottom: -120, right: -30, width: 180, height: 160, background: 'rgba(15,98,254,0.08)', borderRadius: '70%' }} />
 
-                <div style={{ position: 'relative', zIndex: 2, padding: '20px 35px 15px 35px', height: '100%' }}>
+                <div style={{ position: 'relative', zIndex: 2, padding: '16px 30px 15px 24px', height: '100%' }}>
                   {/* header row */}
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <div style={{ fontSize: 14 }}>
-                      <div>No. Kwitansi :</div>
-                      <div style={{ fontWeight: 700, fontSize: 20, letterSpacing: 1 }}>{selectedTransaction.no_kwitansi || '-'}</div>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                    <div style={{ fontSize: 11, minWidth: 140 }}>
+                      <div style={{ marginBottom: 2 }}>No. Kwitansi :</div>
+                      <div style={{ fontWeight: 700, fontSize: 15, letterSpacing: 1.1 }}>{selectedTransaction.no_kwitansi || '-'}</div>
                     </div>
                     <div style={{ textAlign: 'center', flex: 1 }}>
-                      <div style={{ fontSize: 36, fontWeight: 900, letterSpacing: 6 }}>KWITANSI</div>
-                      <div style={{ fontSize: 12, marginTop: 2, letterSpacing: 3 }}>AQSO RESIDENCE</div>
+                      <div style={{ fontSize: 23, fontWeight: 900, letterSpacing: 7, marginBottom: 1 }}>KWITANSI</div>
+                      <div style={{ fontSize: 10, marginTop: 1, letterSpacing: 5 }}>AQSO RESIDENCE</div>
                     </div>
-                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', minWidth: 110 }}>
                       <img 
                         src={LogoAQSO} 
                         alt="AQSO RESIDENCE" 
-                        style={{ 
-                          width: 80, 
-                          height: 80,
-                          marginRight: '10px'
-                        }} 
+                        style={{ width: 43, height: 43, marginRight: '4px' }} 
                       />
                     </div>
                   </div>
 
-                  {/* body table style */}
-                  <div style={{ marginTop: 15, border: '2px solid #0f62fe', borderRadius: 6, padding: '10px 14px 4px 14px' }}>
+                  {/* body kwitansi, semua field vertikal atas-bawah */}
+                  <div style={{ marginTop: 14, border: '1.4px solid #0f62fe', borderRadius: 7, padding: '11px 4px 13px 9px', background: '#f5faff', width: '100%', maxWidth: '100%' }}>
                     {[
                       { label: 'SUDAH TERIMA DARI', value: selectedTransaction.diterima_dari || '-' },
                       { label: 'UNTUK PEMBAYARAN', value: selectedTransaction.untuk_pembayaran || '-' },
                       { label: 'KET. PEMBAYARAN', value: selectedTransaction.ket_pembayaran || '-' },
                       { label: 'NAMA MARKETING', value: selectedTransaction.nama_marketing || '-' },
-                      {
-                        label: 'JUMLAH',
-                        value: `Rp ${selectedTransaction.jumlah?.toLocaleString('id-ID')}`,
-                        strong: true
-                      },
-                      { label: 'TERBILANG', value: selectedTransaction.terbilang || '-' }
+                      { label: 'JUMLAH', value: `Rp ${selectedTransaction.jumlah?.toLocaleString('id-ID')}` },
+                      { label: 'TERBILANG', value: selectedTransaction.terbilang || '-' },
                     ].map((row, idx) => (
                       <div
-                        key={row.label}
+                        key={idx}
                         style={{
                           display: 'flex',
                           alignItems: 'center',
                           borderBottom: idx === 5 ? 'none' : '1px solid #d7e7ff',
-                          padding: '6px 4px',
-                          fontSize: idx === 4 ? 16 : 13
+                          fontSize: row.label === 'JUMLAH' ? 13 : 11,
+                          minHeight: 23,
+                          padding: '4px 0',
                         }}
                       >
-                        <div style={{ width: 200, fontWeight: 600 }}>{row.label}</div>
-                        <div style={{ width: 15, fontWeight: 600 }}>:</div>
-                        <div style={{ flex: 1, fontWeight: row.strong ? 700 : 500 }}>{row.value}</div>
+                        <div style={{ width: 150, fontWeight: 600 }}>{row.label}</div>
+                        <div style={{ width: 13, fontWeight: 600 }}>:</div>
+                        <div style={{ flex: 1, fontWeight: row.label === 'JUMLAH' ? 700 : 500, minWidth: 120 }}>{row.value}</div>
                       </div>
                     ))}
                   </div>
 
                   {/* footer */}
                   <div style={{ marginTop: 15, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
-                    <div style={{ fontSize: 10, color: '#123054', flex: 1 }}>
-                      <div style={{ fontWeight: 700, marginBottom: 4 }}>Catatan:</div>
-                      <div>- Rekening Pembayaran PT. Bank .........................................................</div>
-                      <div>- Sertakan Foto Bukti Transfer, Nama Customer, Blok Pembayaran / Angsuran</div>
+                    <div style={{ fontSize: 10, color: '#123054', flex: 1.5, lineHeight: 1.6 }}>
+                      <div style={{ fontWeight: 700, marginBottom: 2, fontSize: 10.6 }}>Catatan:</div>
+                      <div style={{ marginBottom: 2 }}>- Rekening Pembayaran PT. Bank .........................................................</div>
+                      <div style={{ marginBottom: 2 }}>- Sertakan Foto Bukti Transfer, Nama Customer, Blok Pembayaran / Angsuran</div>
                       <div>- UTJ berlaku maksimal 10 hari dari tanggal kwitansi ini</div>
                     </div>
-                    <div style={{ textAlign: 'center', width: 200, marginLeft: 20 }}>
-                      <div style={{ fontSize: 12 }}>................................/......../20......</div>
-                      <div style={{ marginTop: 40, borderTop: '1px solid #222', paddingTop: 2, fontSize: 11 }}>Marketing / Penerima</div>
+                    <div style={{ textAlign: 'center', width: 134, marginLeft: 13 }}>
+                      <div style={{ fontSize: 10, marginBottom: 6 }}>................................/......../20......</div>
+                      <div style={{ borderTop: '1px solid #222', fontSize: 10, paddingTop: 0, marginTop: 0, marginBottom: 0 }}>Marketing / Penerima</div>
                     </div>
                   </div>
                 </div>
