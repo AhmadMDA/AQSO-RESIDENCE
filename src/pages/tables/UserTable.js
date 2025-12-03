@@ -79,7 +79,21 @@ export default () => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setForm(prev => ({ ...prev, [name]: value }));
+    
+    // Auto-set price based on house type
+    if (name === 'type') {
+      let harga = '';
+      if (value === 'Type 35') {
+        harga = '240000000'; // 240 juta
+      } else if (value === 'Type 55') {
+        harga = '735000000'; // 735 juta
+      } else if (value === 'Type 70') {
+        harga = '450000000'; // 450 juta
+      }
+      setForm(prev => ({ ...prev, [name]: value, harga: harga }));
+    } else {
+      setForm(prev => ({ ...prev, [name]: value }));
+    }
   };
 
   const validate = () => {
@@ -315,7 +329,7 @@ export default () => {
               </Form.Label>
               
               </Form.Group></Col>
-              <Col md={4}><Form.Group className="mb-3"><Form.Label>Harga</Form.Label><Form.Control name="harga" type="number" value={form.harga} onChange={handleChange} /></Form.Group></Col>
+              <Col md={4}><Form.Group className="mb-3"><Form.Label>Harga</Form.Label><Form.Control name="harga" type="number" value={form.harga} onChange={handleChange} placeholder="Otomatis terisi sesuai type" /></Form.Group></Col>
               <Col md={4}><Form.Group className="mb-3"><Form.Label>No Rumah</Form.Label><Form.Control name="no_rumah" value={form.no_rumah} onChange={handleChange} /></Form.Group></Col>
             </Row>
             <Form.Group className="mb-3"><Form.Label>Keterangan</Form.Label><Form.Control name="keterangan" as="textarea" rows={2} value={form.keterangan} onChange={handleChange} /></Form.Group>

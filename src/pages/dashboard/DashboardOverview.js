@@ -9,8 +9,8 @@ import {
   AcquisitionWidget 
 } from "../../components/Widgets";
 
-import { PageVisitsTable } from "../../components/Tables";
 import { trafficShares, totalOrders } from "../../data/charts";
+import { Card, Table } from '@themesberg/react-bootstrap';
 
 export default () => {
   
@@ -33,6 +33,9 @@ export default () => {
 
   // State untuk data chart bulanan pendapatan
   const [pendapatanChartData, setPendapatanChartData] = useState({labels:[],series:[[]]});
+
+  // State untuk tabel pendapatan
+  const [pendapatanTableData, setPendapatanTableData] = useState([]);
 
   useEffect(() => {
     const fetchUserTypes = async () => {
@@ -137,8 +140,38 @@ export default () => {
         setPendapatan(totalThisMonth);
         let percent = totalLastMonth === 0 ? (totalThisMonth > 0 ? 100 : 0) : (((totalThisMonth-totalLastMonth)/totalLastMonth)*100).toFixed(1);
         setPendapatanPercentage(percent);
+
+        // Prepare table data - ambil 10 transaksi terbaru
+        const tableData = kavlings
+          .map(k => {
+            const tgl_raw = k.tanggal_pembayaran || k.tanggal || k.createdAt || "";
+            const tgl = tgl_raw ? new Date(tgl_raw) : null;
+            const dp = Number(k.pembayaran_dp != null ? k.pembayaran_dp : (k.dp != null ? k.dp : 0)) || 0;
+            let cicilans = [];
+            if (Array.isArray(k.pembayaran_cicilan)) cicilans = k.pembayaran_cicilan.map(c => Number(c) || 0);
+            else if (Array.isArray(k.angsuran)) cicilans = k.angsuran.map(c => Number(c) || 0);
+            else if (k.pembayaran_cicilan != null) cicilans = [Number(k.pembayaran_cicilan) || 0];
+            else if (k.angsuran != null) cicilans = [Number(k.angsuran) || 0];
+            const totalCicilan = cicilans.reduce((a,b)=>a+b,0);
+            const investasi = dp + totalCicilan;
+            
+            return {
+              id: k.id,
+              tanggal: tgl ? tgl.toLocaleDateString('id-ID') : '-',
+              tanggalSort: tgl ? tgl.getTime() : 0,
+              dp: dp,
+              cicilan: totalCicilan,
+              investasi: investasi
+            };
+          })
+          .filter(item => item.investasi > 0)
+          .sort((a, b) => b.tanggalSort - a.tanggalSort)
+          .slice(0, 10);
+        
+        setPendapatanTableData(tableData);
       } catch {
         setPendapatan(0); setPendapatanChartData({labels:[],series:[[]]}); setPendapatanPercentage(0);
+        setPendapatanTableData([]);
       }
     }
     fetchKavlingPendapatan();
@@ -212,45 +245,45 @@ export default () => {
       </Row>
 
       <Row>
-        <Col xs={12} xl={12} className="mb-4">
-          <Row>
-            <Col xs={12} xl={8} className="mb-4">
-              <Row>
-                <Col xs={12} className="mb-4">
-                  <PageVisitsTable />
+        <Col xs={12} className="mb-4">
+          <Card border="light" className="shadow-sm">
+            <Card.Header>
+              <Row className="align-items-center">
+                <Col>
+                  <h5>Tabel Pendapatan</h5>
                 </Col>
-
-                {/* <Col xs={12} lg={6} className="mb-4">
-                  <TeamMembersWidget />
-                </Col> */}
-
-                {/* <Col xs={12} lg={6} className="mb-4">
-                  <ProgressTrackWidget />
-                </Col> */}
               </Row>
-            </Col>
-
-            <Col xs={12} xl={4}>
-              <Row>
-                <Col xs={12} className="mb-4">
-                  <BarChartWidget
-                    title="Total orders"
-                    value={452}
-                    percentage={18.2}
-                    data={totalOrders}
-                  />
-                </Col>
-
-                {/* <Col xs={12} className="px-0 mb-4">
-                  <RankingWidget />
-                </Col> */}
-
-                {/* <Col xs={12} className="px-0">
-                  <AcquisitionWidget />
-                </Col> */}
-              </Row>
-            </Col>
-          </Row>
+            </Card.Header>
+            <Table responsive className="align-items-center table-flush">
+              <thead className="thead-light">
+                <tr>
+                  <th scope="col1">Tanggal</th>
+                  <th scope="col1">DP</th>
+                  <th scope="col1">Cicilan</th>
+                  <th scope="col1">Investasi</th>
+                  <th scope="col1">Total Pendapatan</th>
+                </tr>
+              </thead>
+              <tbody>
+                {pendapatanTableData.length > 0 ? (
+                  pendapatanTableData.map((item, index) => (
+                    <tr key={item.id || index}>
+                      <td>{item.tanggal}</td>
+                      <td>Rp {item.dp.toLocaleString('id-ID')}</td>
+                      <td>Rp {item.cicilan.toLocaleString('id-ID')}</td>
+                      <td><strong>Rp {item.investasi.toLocaleString('id-ID')}</strong></td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan="4" className="text-center py-4">
+                      <p className="text-muted">Tidak ada data pendapatan</p>
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </Table>
+          </Card>
         </Col>
       </Row>
     </>
