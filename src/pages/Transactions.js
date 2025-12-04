@@ -1094,7 +1094,7 @@ export default () => {
                     </div>
                     <div style={{ textAlign: 'center', width: 134, marginLeft: 13 }}>
                       <div style={{ fontSize: 10, marginBottom: 6 }}>................................/......../20......</div>
-                      <div style={{ borderTop: '1px solid #222', fontSize: 10, paddingTop: 0, marginTop: 0, marginBottom: 0 }}>Admin</div>
+                      <div style={{ borderTop: '1px solid #222', fontSize: 10, paddingTop: 0, marginTop: 0, marginBottom: 0 }}>Marketing / Penerima</div>
                     </div>
                   </div>
                 </div>

@@ -37,6 +37,9 @@ export default () => {
   // State untuk tabel pendapatan
   const [pendapatanTableData, setPendapatanTableData] = useState([]);
 
+  // State untuk tabel pengeluaran
+  const [pengeluaranTableData, setPengeluaranTableData] = useState([]);
+
   useEffect(() => {
     const fetchUserTypes = async () => {
       try {
@@ -92,12 +95,21 @@ export default () => {
     };
     fetchUserTypes();
 
-    // Fetch dan hitung pendapatan bulan ini & bulan lalu
-    async function fetchKavlingPendapatan() {
+    // Fetch dan hitung pendapatan + pengeluaran
+    async function fetchPendapatanDanPengeluaran() {
       try {
-        const res = await fetch("http://localhost:4000/api/kavlings");
-        if (!res.ok) throw new Error("Failed to fetch kavlings");
-        const kavlings = await res.json();
+        // Fetch data kavling dan kas secara paralel
+        const [kavlingRes, kasRes] = await Promise.all([
+          fetch("http://localhost:4000/api/kavlings"),
+          fetch("http://localhost:4000/api/kas")
+        ]);
+        
+        if (!kavlingRes.ok) throw new Error("Failed to fetch kavlings");
+        if (!kasRes.ok) throw new Error("Failed to fetch kas");
+        
+        const kavlings = await kavlingRes.json();
+        const kasData = await kasRes.json();
+        
         const now = new Date();
         const bulanIni = now.getMonth(), tahunIni = now.getFullYear();
         const bulanLalu = (bulanIni === 0 ? 11 : bulanIni - 1);
@@ -106,29 +118,48 @@ export default () => {
         let totalLastMonth = 0;
 
         // ----------- CHART DATA per bulan -----------
-        // Bentuk { '2024-04': total, ... }
         const pendapatanPerBulan = {};
+        
+        // Proses data kavling (DP + Cicilan)
         kavlings.forEach(k => {
-          // Ambil tanggal
           const tgl_raw = k.tanggal_pembayaran || k.tanggal || k.createdAt || "";
           const tgl = tgl_raw ? new Date(tgl_raw) : null;
-          if (!tgl || isNaN(tgl)) return; // skip row kalau gagal date
-          // Ambil DP
+          if (!tgl || isNaN(tgl)) return;
+          
           const dp = Number(k.pembayaran_dp != null ? k.pembayaran_dp : (k.dp != null ? k.dp : 0)) || 0;
-          // Ambil cicilan array atau single
           let cicilans = [];
           if (Array.isArray(k.pembayaran_cicilan)) cicilans = k.pembayaran_cicilan.map(c => Number(c) || 0);
           else if (Array.isArray(k.angsuran)) cicilans = k.angsuran.map(c => Number(c) || 0);
           else if (k.pembayaran_cicilan != null) cicilans = [Number(k.pembayaran_cicilan) || 0];
           else if (k.angsuran != null) cicilans = [Number(k.angsuran) || 0];
-          // Kalkulasi per bulan
+          
           const key = `${tgl.getFullYear()}-${(tgl.getMonth()+1).toString().padStart(2,'0')}`;
           pendapatanPerBulan[key] = (pendapatanPerBulan[key]||0) + dp + cicilans.reduce((a,b)=>a+b,0);
-          if (tgl.getMonth() === bulanIni && tgl.getFullYear() === tahunIni) totalThisMonth += dp + cicilans.reduce((a,b)=>a+b,0);
-          else if (tgl.getMonth() === bulanLalu && tgl.getFullYear() === tahunLalu) totalLastMonth += dp + cicilans.reduce((a,b)=>a+b,0);
+          
+          if (tgl.getMonth() === bulanIni && tgl.getFullYear() === tahunIni) {
+            totalThisMonth += dp + cicilans.reduce((a,b)=>a+b,0);
+          } else if (tgl.getMonth() === bulanLalu && tgl.getFullYear() === tahunLalu) {
+            totalLastMonth += dp + cicilans.reduce((a,b)=>a+b,0);
+          }
         });
-        // DEBUG: log hasil agregat
-        console.log('HASIL pendapatanPerBulan:', pendapatanPerBulan);
+        
+        // Proses data kas (Investasi dari uangMasuk)
+        kasData.forEach(kas => {
+          const tgl_raw = kas.tanggal || "";
+          const tgl = tgl_raw ? new Date(tgl_raw) : null;
+          if (!tgl || isNaN(tgl)) return;
+          
+          const investasi = Number(kas.uangMasuk) || 0;
+          const key = `${tgl.getFullYear()}-${(tgl.getMonth()+1).toString().padStart(2,'0')}`;
+          pendapatanPerBulan[key] = (pendapatanPerBulan[key]||0) + investasi;
+          
+          if (tgl.getMonth() === bulanIni && tgl.getFullYear() === tahunIni) {
+            totalThisMonth += investasi;
+          } else if (tgl.getMonth() === bulanLalu && tgl.getFullYear() === tahunLalu) {
+            totalLastMonth += investasi;
+          }
+        });
+
         // Generate chart format
         const sortedKeys = Object.keys(pendapatanPerBulan).sort();
         const chartLabels = sortedKeys.map(key => {
@@ -141,40 +172,81 @@ export default () => {
         let percent = totalLastMonth === 0 ? (totalThisMonth > 0 ? 100 : 0) : (((totalThisMonth-totalLastMonth)/totalLastMonth)*100).toFixed(1);
         setPendapatanPercentage(percent);
 
-        // Prepare table data - ambil 10 transaksi terbaru
-        const tableData = kavlings
-          .map(k => {
-            const tgl_raw = k.tanggal_pembayaran || k.tanggal || k.createdAt || "";
-            const tgl = tgl_raw ? new Date(tgl_raw) : null;
-            const dp = Number(k.pembayaran_dp != null ? k.pembayaran_dp : (k.dp != null ? k.dp : 0)) || 0;
-            let cicilans = [];
-            if (Array.isArray(k.pembayaran_cicilan)) cicilans = k.pembayaran_cicilan.map(c => Number(c) || 0);
-            else if (Array.isArray(k.angsuran)) cicilans = k.angsuran.map(c => Number(c) || 0);
-            else if (k.pembayaran_cicilan != null) cicilans = [Number(k.pembayaran_cicilan) || 0];
-            else if (k.angsuran != null) cicilans = [Number(k.angsuran) || 0];
-            const totalCicilan = cicilans.reduce((a,b)=>a+b,0);
-            const investasi = dp + totalCicilan;
-            
-            return {
-              id: k.id,
-              tanggal: tgl ? tgl.toLocaleDateString('id-ID') : '-',
-              tanggalSort: tgl ? tgl.getTime() : 0,
-              dp: dp,
-              cicilan: totalCicilan,
-              investasi: investasi
-            };
-          })
-          .filter(item => item.investasi > 0)
+        // Prepare table data pendapatan - gabungkan data kavling dengan kas
+        // Buat map untuk investasi per tanggal dari kas
+        const investasiPerTanggal = {};
+        kasData.forEach(kas => {
+          const tgl_raw = kas.tanggal || "";
+          const tgl = tgl_raw ? new Date(tgl_raw) : null;
+          if (!tgl || isNaN(tgl)) return;
+          
+          const dateKey = tgl.toLocaleDateString('id-ID');
+          const investasi = Number(kas.uangMasuk) || 0;
+          investasiPerTanggal[dateKey] = (investasiPerTanggal[dateKey] || 0) + investasi;
+        });
+
+        // Proses data kavling untuk tabel
+        const kavlingTableData = kavlings.map(k => {
+          const tgl_raw = k.tanggal_pembayaran || k.tanggal || k.createdAt || "";
+          const tgl = tgl_raw ? new Date(tgl_raw) : null;
+          const dp = Number(k.pembayaran_dp != null ? k.pembayaran_dp : (k.dp != null ? k.dp : 0)) || 0;
+          let cicilans = [];
+          if (Array.isArray(k.pembayaran_cicilan)) cicilans = k.pembayaran_cicilan.map(c => Number(c) || 0);
+          else if (Array.isArray(k.angsuran)) cicilans = k.angsuran.map(c => Number(c) || 0);
+          else if (k.pembayaran_cicilan != null) cicilans = [Number(k.pembayaran_cicilan) || 0];
+          else if (k.angsuran != null) cicilans = [Number(k.angsuran) || 0];
+          const totalCicilan = cicilans.reduce((a,b)=>a+b,0);
+          
+          const dateKey = tgl ? tgl.toLocaleDateString('id-ID') : '-';
+          const investasi = investasiPerTanggal[dateKey] || 0;
+          const totalPendapatan = dp + totalCicilan + investasi;
+          
+          return {
+            id: k.id,
+            tanggal: dateKey,
+            tanggalSort: tgl ? tgl.getTime() : 0,
+            dp: dp,
+            cicilan: totalCicilan,
+            investasi: investasi,
+            totalPendapatan: totalPendapatan
+          };
+        }).filter(item => item.totalPendapatan > 0)
           .sort((a, b) => b.tanggalSort - a.tanggalSort)
           .slice(0, 10);
         
-        setPendapatanTableData(tableData);
-      } catch {
-        setPendapatan(0); setPendapatanChartData({labels:[],series:[[]]}); setPendapatanPercentage(0);
+        setPendapatanTableData(kavlingTableData);
+
+        // Prepare table data pengeluaran dari kas
+        const pengeluaranData = kasData
+          .map(kas => {
+            const tgl_raw = kas.tanggal || "";
+            const tgl = tgl_raw ? new Date(tgl_raw) : null;
+            const harga = Number(kas.harga) || 0;
+            
+            return {
+              id: kas.id,
+              tanggal: tgl ? tgl.toLocaleDateString('id-ID') : '-',
+              tanggalSort: tgl ? tgl.getTime() : 0,
+              keterangan: kas.ketBelanja || '-',
+              jumlah: harga
+            };
+          })
+          .filter(item => item.jumlah > 0)
+          .sort((a, b) => b.tanggalSort - a.tanggalSort)
+          .slice(0, 10);
+        
+        setPengeluaranTableData(pengeluaranData);
+
+      } catch (err) {
+        console.error('Gagal fetch data:', err);
+        setPendapatan(0); 
+        setPendapatanChartData({labels:[],series:[[]]}); 
+        setPendapatanPercentage(0);
         setPendapatanTableData([]);
+        setPengeluaranTableData([]);
       }
     }
-    fetchKavlingPendapatan();
+    fetchPendapatanDanPengeluaran();
   }, []);
 
   const handleUploadClick = () => {
@@ -250,18 +322,18 @@ export default () => {
             <Card.Header>
               <Row className="align-items-center">
                 <Col>
-                  <h5>Tabel Pendapatan</h5>
+                  <h5>Tabel Data Pendapatan</h5>
                 </Col>
               </Row>
             </Card.Header>
             <Table responsive className="align-items-center table-flush">
               <thead className="thead-light">
                 <tr>
-                  <th scope="col1">Tanggal</th>
-                  <th scope="col1">DP</th>
-                  <th scope="col1">Cicilan</th>
-                  <th scope="col1">Investasi</th>
-                  <th scope="col1">Total Pendapatan</th>
+                  <th scope="col">Tanggal</th>
+                  <th scope="col">DP</th>
+                  <th scope="col">Cicilan</th>
+                  <th scope="col">Investasi</th>
+                  <th scope="col">Total Pendapatan</th>
                 </tr>
               </thead>
               <tbody>
@@ -271,13 +343,54 @@ export default () => {
                       <td>{item.tanggal}</td>
                       <td>Rp {item.dp.toLocaleString('id-ID')}</td>
                       <td>Rp {item.cicilan.toLocaleString('id-ID')}</td>
-                      <td><strong>Rp {item.investasi.toLocaleString('id-ID')}</strong></td>
+                      <td>Rp {item.investasi.toLocaleString('id-ID')}</td>
+                      <td><strong>Rp {item.totalPendapatan.toLocaleString('id-ID')}</strong></td>
                     </tr>
                   ))
                 ) : (
                   <tr>
-                    <td colSpan="4" className="text-center py-4">
+                    <td colSpan="5" className="text-center py-4">
                       <p className="text-muted">Tidak ada data pendapatan</p>
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </Table>
+          </Card>
+        </Col>
+      </Row>
+
+      <Row>
+        <Col xs={12} className="mb-4">
+          <Card border="light" className="shadow-sm">
+            <Card.Header>
+              <Row className="align-items-center">
+                <Col>
+                  <h5>Tabel Data Pengeluaran</h5>
+                </Col>
+              </Row>
+            </Card.Header>
+            <Table responsive className="align-items-center table-flush">
+              <thead className="thead-light">
+                <tr>
+                  <th scope="col">Tanggal</th>
+                  <th scope="col">Keterangan</th>
+                  <th scope="col">Jumlah Pengeluaran</th>
+                </tr>
+              </thead>
+              <tbody>
+                {pengeluaranTableData.length > 0 ? (
+                  pengeluaranTableData.map((item, index) => (
+                    <tr key={item.id || index}>
+                      <td>{item.tanggal}</td>
+                      <td>{item.keterangan}</td>
+                      <td><strong>Rp {item.jumlah.toLocaleString('id-ID')}</strong></td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan="3" className="text-center py-4">
+                      <p className="text-muted">Tidak ada data pengeluaran</p>
                     </td>
                   </tr>
                 )}
