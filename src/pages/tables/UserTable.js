@@ -3,11 +3,12 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCog, faTrash, faEdit } from '@fortawesome/free-solid-svg-icons';
 import { Col, Row, Form, Button, ButtonGroup, Breadcrumb, Dropdown, Modal, Table, Card, Alert } from '@themesberg/react-bootstrap';
 import * as XLSX from 'xlsx';
+import API_URL from "../../config/api";
 
 const printStyles = `@media print { * { visibility: hidden; } #printContent, #printContent * { visibility: visible; } #printContent { position: absolute; left: 0; top: 0; width: 100%; } body { margin: 0; padding: 0; } } @page { margin: 0.5cm; size: A4; }`;
 
 export default () => {
-  const API_BASE = 'http://localhost:4000/api';
+  const API_BASE = API_URL;
 
   useEffect(() => {
     const style = document.createElement('style');

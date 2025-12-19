@@ -3,14 +3,15 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCashRegister, faChartLine, faCloudUploadAlt, faDesktop, faMobileAlt, faTabletAlt } from '@fortawesome/free-solid-svg-icons';
 import { Col, Row, Button, Dropdown, ButtonGroup } from '@themesberg/react-bootstrap';
 
-import { 
-  CounterWidget, CircleChartWidget, BarChartWidget, TeamMembersWidget, 
-  ProgressTrackWidget, RankingWidget, SalesValueWidget, SalesValueWidgetPhone, 
-  AcquisitionWidget 
+import {
+  CounterWidget, CircleChartWidget, BarChartWidget, TeamMembersWidget,
+  ProgressTrackWidget, RankingWidget, SalesValueWidget, SalesValueWidgetPhone,
+  AcquisitionWidget
 } from "../../components/Widgets";
 
 import { trafficShares, totalOrders } from "../../data/charts";
 import { Card, Table } from '@themesberg/react-bootstrap';
+import API_URL from "../../config/api";
 
 export default () => {
   
@@ -43,7 +44,7 @@ export default () => {
   useEffect(() => {
     const fetchUserTypes = async () => {
       try {
-        const res = await fetch("http://localhost:4000/api/customers");
+        const res = await fetch(`${API_URL}/customers`);
         if (!res.ok) throw new Error("Failed to fetch users");
         const users = await res.json();
 
@@ -100,8 +101,8 @@ export default () => {
       try {
         // Fetch data kavling dan kas secara paralel
         const [kavlingRes, kasRes] = await Promise.all([
-          fetch("http://localhost:4000/api/kavlings"),
-          fetch("http://localhost:4000/api/kas")
+          fetch(`${API_URL}/kavlings`),
+          fetch(`${API_URL}/kas`)
         ]);
         
         if (!kavlingRes.ok) throw new Error("Failed to fetch kavlings");

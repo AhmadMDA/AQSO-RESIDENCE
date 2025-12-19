@@ -8,6 +8,7 @@ import { Link, useHistory } from 'react-router-dom';
 
 import { Routes } from "../../routes";
 import BgImage from "../../assets/img/illustrations/signin.svg";
+import { API_URL, BACKEND_URL } from "../../config/api";
 
 
 export default () => {
@@ -41,7 +42,7 @@ export default () => {
     setMessage(null);
     setIsLoading(true);
     
-    fetch('http://localhost:4000/api/login', {
+    fetch(`${API_URL}/login`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email, password })
@@ -68,8 +69,7 @@ export default () => {
     setIsLoading(true);
     
     // Redirect to OAuth provider
-    const backendUrl = 'http://localhost:4000';
-    window.location.href = `${backendUrl}/api/auth/${provider}`;
+    window.location.href = `${BACKEND_URL}/api/auth/${provider}`;
   };
 
   return (
