@@ -4,6 +4,7 @@ import { faHome, faTrash, faEdit, faCheck, faTimes } from '@fortawesome/free-sol
 import { Col, Row, Card, Button, Breadcrumb, Table, Modal, Form } from '@themesberg/react-bootstrap';
 
 import { Routes } from "../routes";
+import API_URL from "../config/api";
 
 export default () => {
   const [users, setUsers] = useState([]);
@@ -20,7 +21,7 @@ export default () => {
 
   const fetchUsers = async () => {
     try {
-      const response = await fetch('http://localhost:4000/api/users');
+      const response = await fetch(`${API_URL}/users`);
       if (!response.ok) throw new Error('Failed to fetch');
       const data = await response.json();
       setUsers(data);
@@ -45,7 +46,7 @@ export default () => {
   const handleSaveRole = async (id) => {
     try {
       // Coba update via backend
-      const response = await fetch('http://localhost:4000/api/users/' + id, {
+      const response = await fetch(`${API_URL}/users/${id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ role: editRole })
@@ -73,7 +74,7 @@ export default () => {
     if (!deleteTarget) return;
     try {
       // Coba delete via backend
-      const response = await fetch('http://localhost:4000/api/users/' + deleteTarget, {
+      const response = await fetch(`${API_URL}/users/${deleteTarget}`, {
         method: 'DELETE'
       });
       if (!response.ok) throw new Error('Failed to delete');

@@ -5,6 +5,7 @@ import { faCheck, faCog, faHome, faTrash, faEdit } from '@fortawesome/free-solid
 import { Col, Row, Form, Button, ButtonGroup, Breadcrumb, Dropdown, Modal, Table, Card, Alert } from '@themesberg/react-bootstrap';
 import * as XLSX from 'xlsx';
 import LogoAQSO from "../assets/img/Gemini_Generated_Image_82909d82909d829.png";
+import API_URL from "../config/api";
 
 // CSS untuk print - optimized for A4 paper (portrait)
 const printStyles = `
@@ -93,9 +94,8 @@ const printStyles = `
 `;
 
 export default () => {
-  // Use explicit backend URL for API calls during local development.
-  // If you deploy and need a different backend, set REACT_APP_API_BASE at build time.
-  const API_BASE = 'http://localhost:4000/api';
+  // Use API_URL from config which reads from environment variable
+  const API_BASE = API_URL;
   // Add print styles to document head
   useEffect(() => {
     const style = document.createElement('style');

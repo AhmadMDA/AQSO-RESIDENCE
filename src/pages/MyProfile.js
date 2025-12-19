@@ -4,6 +4,7 @@ import { faHome, faSave, faTimes, faEdit, faCamera } from '@fortawesome/free-sol
 import { Col, Row, Card, Button, Breadcrumb, Form, Alert, Image } from '@themesberg/react-bootstrap';
 
 import Profile3 from "../assets/img/team/profile-picture-3.jpg";
+import API_URL from "../config/api";
 
 export default () => {
   const [authUser, setAuthUser] = useState(null);
@@ -110,7 +111,7 @@ export default () => {
       }
 
       // Try to save to backend first
-      const response = await fetch(`http://localhost:4000/api/profile/${authUser.email}`, {
+      const response = await fetch(`${API_URL}/profile/${authUser.email}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData)

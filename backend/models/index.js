@@ -8,7 +8,17 @@ const db = {};
 
 let sequelize;
 if (config.use_env_variable) {
-  sequelize = new Sequelize(process.env[config.use_env_variable], config);
+  // Handle DATABASE_URL for production (Railway, etc.)
+  const dbUrl = process.env[config.use_env_variable];
+  if (!dbUrl) {
+    console.error(`[Database] Environment variable ${config.use_env_variable} is not set!`);
+    process.exit(1);
+  }
+  sequelize = new Sequelize(dbUrl, {
+    dialect: config.dialect || 'mysql',
+    dialectOptions: config.dialectOptions || {},
+    logging: config.logging !== undefined ? config.logging : false
+  });
 } else {
   sequelize = new Sequelize(config.database, config.username, config.password, config);
 }

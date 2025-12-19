@@ -16,11 +16,14 @@
     "logging": false
   },
   "production": {
-    "username": "root",
-    "password": "",
-    "database": "aqso_db_production",
-    "host": "localhost",
+    "use_env_variable": "DATABASE_URL",
     "dialect": "mysql",
+    "dialectOptions": {
+      "ssl": {
+        "require": true,
+        "rejectUnauthorized": false
+      }
+    },
     "logging": false
   }
 }

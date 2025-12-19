@@ -8,6 +8,7 @@ import { Link, useHistory } from 'react-router-dom';
 import { Routes } from "../../routes";
 import BgImage from "../../assets/img/illustrations/signin.svg";
 import Profile3 from "../../assets/img/team/profile-picture-3.jpg";
+import { API_URL } from "../../config/api";
 
 export default () => {
   const history = useHistory();
@@ -70,7 +71,7 @@ export default () => {
       }
 
       // Try backend first
-      const response = await fetch('http://localhost:4000/api/login', {
+      const response = await fetch(`${API_URL}/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email: authUser.email, password })

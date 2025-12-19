@@ -8,6 +8,7 @@ import { Link, useHistory } from 'react-router-dom';
 
 import { Routes } from "../../routes";
 import BgImage from "../../assets/img/illustrations/signin.svg";
+import { API_URL, BACKEND_URL } from "../../config/api";
 
 
 export default () => {
@@ -52,7 +53,7 @@ export default () => {
 
     setIsLoading(true);
     
-    fetch('http://localhost:4000/api/register', {
+    fetch(`${API_URL}/register`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email, password, role: 'admin' })
@@ -91,8 +92,7 @@ export default () => {
     setIsLoading(true);
     
     // Redirect to OAuth provider
-    const backendUrl = 'http://localhost:4000';
-    window.location.href = `${backendUrl}/api/auth/${provider}?mode=signup`;
+    window.location.href = `${BACKEND_URL}/api/auth/${provider}?mode=signup`;
   };
   return (
     <main>

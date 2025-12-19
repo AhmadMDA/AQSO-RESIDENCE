@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faHome, faSave, faTimes } from '@fortawesome/free-solid-svg-icons';
 import { Col, Row, Card, Button, Breadcrumb, Form, Alert } from '@themesberg/react-bootstrap';
+import API_URL from "../config/api";
 
 export default () => {
   const [authUser, setAuthUser] = useState(null);
@@ -54,7 +55,7 @@ export default () => {
       }
 
       // Try to save to backend first
-      const response = await fetch(`http://localhost:4000/api/profile/${authUser.email}`, {
+      const response = await fetch(`${API_URL}/profile/${authUser.email}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData)
