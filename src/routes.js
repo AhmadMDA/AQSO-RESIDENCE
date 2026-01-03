@@ -1,6 +1,6 @@
 export const Routes = {
     // pages
-    Presentation: { path: "/sign-in" },
+    Presentation: { path: "/dashboard/overview"  },
     Signin: { path: "/sign-in" },
     Signup: { path: "/sign-up" },
     ForgotPassword: { path: "/forgot-password" },
