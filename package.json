@@ -1,7 +1,11 @@
 {
   "name": "aqso-residence",
+  "version": "1.0.1",
+  "private": true,
   "description": "",
   "author": "dann",
+  "license": "MIT",
+  "homepage": "",
   "keywords": [
     "bootstrap 5",
     "react",
@@ -13,8 +17,6 @@
     "bootstrap 5 dashboard",
     "themesberg"
   ],
-  "license": "MIT",
-  "homepage": "",
   "bugs": {
     "url": "https://github.com/themesberg/volt-react-dashboard/issues"
   },
@@ -22,7 +24,9 @@
     "type": "git",
     "url": "https://github.com/themewagon/volt-react-dashboard/"
   },
-  "version": "1.0.1",
+  // "engines": {
+  //   "node": "18.x"
+  // },
   "dependencies": {
     "@fortawesome/fontawesome-svg-core": "^1.2.36",
     "@fortawesome/free-brands-svg-icons": "^5.15.4",
@@ -60,8 +64,11 @@
     "sass": "^1.50.0",
     "sequelize": "^6.37.7",
     "simplebar-react": "^2.3.0",
-    "type": "module",
     "xlsx": "^0.18.5"
+  },
+  "devDependencies": {
+    "gh-pages": "^6.3.0",
+    "sequelize-cli": "^6.6.3"
   },
   "scripts": {
     "start": "react-scripts start --openssl-legacy-provider",
@@ -86,14 +93,5 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
-  },
-  "devDependencies": {
-    "gh-pages": "^6.3.0",
-    "sequelize-cli": "^6.6.3"
   }
-  {
-  "engines": {
-    "node": "18.x"
-  }
-}
 }
