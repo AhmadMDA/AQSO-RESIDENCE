@@ -96,7 +96,7 @@ const printStyles = `
 export default () => {
   // Use explicit backend URL for API calls during local development.
   // If you deploy and need a different backend, set REACT_APP_API_BASE at build time.
-  const API_BASE = 'http://localhost:4000/api';
+  const API_BASE = process.env.REACT_APP_API_URL || '';
   // Add print styles to document head
   useEffect(() => {
     const style = document.createElement('style');
