@@ -91,4 +91,9 @@
     "gh-pages": "^6.3.0",
     "sequelize-cli": "^6.6.3"
   }
+  {
+  "engines": {
+    "node": "18.x"
+  }
+}
 }
