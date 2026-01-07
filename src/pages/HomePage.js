@@ -142,7 +142,7 @@ const RouteWithRole = ({ component: Component, allowedRoles = [], ...rest }) => 
 
 export default () => (
   <Switch>
-    <RouteWithLoader exact path="/" component={() => <Redirect to={Routes.DashboardOverview.path} />} />
+    <RouteWithLoader exact path="/" component={DashboardOverview} />
     <RouteWithLoader exact path={Routes.Signin.path} component={Signin} />
     <RouteWithLoader exact path={Routes.Signup.path} component={Signup} />
     <RouteWithLoader exact path={Routes.ForgotPassword.path} component={ForgotPassword} />
