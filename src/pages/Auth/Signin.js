@@ -41,11 +41,29 @@ export default () => {
     setMessage(null);
     setIsLoading(true);
 
-    // Tanpa akses backend, login otomatis masuk dashboard
-    localStorage.setItem('authToken', 'FAKE-TOKEN-AUTO');
-    localStorage.setItem('authUser', JSON.stringify({ email, password, role: 'admin' }));
-    setMessage({ type: 'success', text: 'Login berhasil! (No backend)' });
-    setTimeout(() => history.push(Routes.DashboardOverview.path), 500);
+    setMessage(null);
+    setIsLoading(true);
+    
+    fetch('http://localhost:4000/api/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password })
+    })
+    .then(async res => {
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        throw new Error(data.message || 'Login failed');
+      }
+      return res.json();
+    })
+    .then(data => {
+      localStorage.setItem('authToken', data.token);
+      localStorage.setItem('authUser', JSON.stringify(data.user));
+      setMessage({ type: 'success', text: 'Login berhasil!' });
+      setTimeout(() => history.push(Routes.DashboardOverview.path), 1000);
+    })
+    .catch(err => setMessage({ type: 'danger', text: err.message }))
+    .finally(() => setIsLoading(false));
   };
 
 
