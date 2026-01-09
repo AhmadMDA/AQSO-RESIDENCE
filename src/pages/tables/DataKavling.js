@@ -436,6 +436,7 @@ export default () => {
                 {Array.from({ length: maxCicilan }, (_, i) => (
                   <th key={i} className="border-bottom">Pembayaran {i + 1}</th>
                 ))}
+                <th className="border-bottom">Total Pembayaran</th>
                 <th className="border-bottom">Aksi</th>
               </tr>
             </thead>
@@ -456,6 +457,10 @@ export default () => {
                         {cicilan[i] ? <strong>Rp {Number(cicilan[i]).toLocaleString('id-ID')}</strong> : '-'}
                       </td>
                     ))}
+                    <td><strong>Rp {(
+                      (k.pembayaran_dp || 0) + 
+                      (Array.isArray(k.pembayaran_cicilan) ? k.pembayaran_cicilan.reduce((a,b)=>a+Number(b||0),0) : 0)
+                    ).toLocaleString('id-ID')}</strong></td>
                     <td>
                       <div className="d-flex gap-2">
                         <Button variant="info" size="sm" onClick={() => handleEdit(k)} title="Edit"><FontAwesomeIcon icon={faEdit} /></Button>

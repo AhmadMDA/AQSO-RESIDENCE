@@ -310,7 +310,6 @@ export default () => {
               <th className="border-bottom">#</th>
               <th className="border-bottom">Tanggal</th>
               <th className="border-bottom">Nama</th>
-              <th className="border-bottom">Ket. Tidak Masuk</th>
               <th className="border-bottom">Uang Masuk</th>
               <th className="border-bottom">Ket. Belanja</th>
               <th className="border-bottom">Harga</th>
@@ -324,7 +323,6 @@ export default () => {
                 <td>{idx + 1}</td>
                 <td>{entry.tanggal}</td>
                 <td><strong>{entry.nama}</strong></td>
-                <td>{entry.ketTidakMasuk || '-'}</td>
                 <td><strong>Rp {entry.uangMasuk != null ? Number(entry.uangMasuk).toLocaleString('id-ID') : 0}</strong></td>
                 <td>{entry.ketBelanja || '-'}</td>
                 <td><strong>Rp {entry.harga != null ? Number(entry.harga).toLocaleString('id-ID') : 0}</strong></td>
@@ -383,14 +381,6 @@ export default () => {
               </Col>
             </Row>
 
-            <Form.Group className="mb-3">
-              <Form.Label>Keterangan Tidak Masuk</Form.Label>
-              <Form.Control
-                name="ketTidakMasuk"
-                value={form.ketTidakMasuk}
-                onChange={handleChange}
-              />
-            </Form.Group>
 
             <Row>
               <Col md={6}>

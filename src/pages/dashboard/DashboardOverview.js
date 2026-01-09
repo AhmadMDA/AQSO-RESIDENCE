@@ -39,6 +39,8 @@ export default () => {
 
   // State untuk tabel pengeluaran
   const [pengeluaranTableData, setPengeluaranTableData] = useState([]);
+  // State untuk total pengeluaran
+  const [totalPengeluaran, setTotalPengeluaran] = useState(0);
 
   useEffect(() => {
     const fetchUserTypes = async () => {
@@ -236,6 +238,9 @@ export default () => {
           .slice(0, 10);
         
         setPengeluaranTableData(pengeluaranData);
+        // Hitung total pengeluaran
+        const totalPengeluaranVal = pengeluaranData.reduce((sum, curr) => sum + (curr.jumlah || 0), 0);
+        setTotalPengeluaran(totalPengeluaranVal);
 
       } catch (err) {
         console.error('Gagal fetch data:', err);
@@ -286,33 +291,49 @@ export default () => {
           />
         </Col>
 
-        <Col xs={12} sm={6} xl={4} className="mb-4">
-          <CounterWidget
-            category="Penghuni"
-            title={trafficSharesData.reduce((a,b) => a + b.value, 0)}
-            period={penghuniPeriod}
-            percentage={penghuniPercentage}
-            icon={faChartLine}
-            iconColor="shape-secondary"
-          />
-        </Col>
+        {/* Baris sejajar 4 card */}
+        <Col xs={12} className="mb-4">
+          <Row>
+            <Col xs={12} sm={6} xl={3} className="mb-4 mb-xl-0">
+              <CounterWidget
+                category="Penghuni"
+                title={trafficSharesData.reduce((a,b) => a + b.value, 0)}
+                period={penghuniPeriod}
+                percentage={penghuniPercentage}
+                icon={faChartLine}
+                iconColor="shape-secondary"
+              />
+            </Col>
 
-        <Col xs={12} sm={6} xl={4} className="mb-4">
-          <CounterWidget
-            category="Total Pendapatan"
-            title="$43,594"
-            period="Feb 1 - Apr 1"
-            percentage={28.4}
-            icon={faCashRegister}
-            iconColor="shape-tertiary"
-          />
-        </Col>
+            <Col xs={12} sm={6} xl={3} className="mb-4 mb-xl-0">
+              <CounterWidget
+                category="Total Pendapatan"
+                title={pendapatan.toLocaleString('id-ID',{ style: 'currency', currency: 'IDR', maximumFractionDigits: 0 })}
+                period="Bulan Ini"
+                percentage={pendapatanPercentage}
+                icon={faCashRegister}
+                iconColor="shape-tertiary"
+              />
+            </Col>
 
-        <Col xs={12} sm={6} xl={4} className="mb-4">
-          <CircleChartWidget
-            title="Type Rumah"
-            data={trafficSharesData}
-          />
+            <Col xs={12} sm={6} xl={3} className="mb-4 mb-xl-0">
+              <CounterWidget
+                category="Total Pengeluaran"
+                title={totalPengeluaran.toLocaleString('id-ID',{ style: 'currency', currency: 'IDR', maximumFractionDigits: 0 })}
+                period="Bulan Ini"
+                percentage={0}
+                icon={faCashRegister}
+                iconColor="shape-danger"
+              />
+            </Col>
+
+            <Col xs={12} sm={6} xl={3} className="mb-4 mb-xl-0">
+              <CircleChartWidget
+                title="Type Rumah"
+                data={trafficSharesData}
+              />
+            </Col>
+          </Row>
         </Col>
       </Row>
 
