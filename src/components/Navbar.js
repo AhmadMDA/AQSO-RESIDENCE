@@ -11,8 +11,6 @@ import Profile3 from "../assets/img/team/profile-picture-3.jpg";
 import { Link } from "react-router-dom";
 import { Routes } from "../routes";
 
-import LogoAQSO from "../assets/img/Gemini_Generated_Image_82909d82909d8290.png";
-
 
 
 export default (props) => {
@@ -65,14 +63,6 @@ export default (props) => {
       <Container fluid className="px-0">
         <div className="d-flex justify-content-between w-100">
           <div className="d-flex align-items-center">
-            {/* Logo AQSO RESIDENCE */}
-            <Link to={Routes.DashboardOverview.path} className="me-3 d-flex align-items-center text-decoration-none">
-              <Image 
-                src={LogoAQSO} 
-                style={{ maxHeight: '40px', width: 'auto', marginRight: '10px' }} 
-              />
-              <span className="text-white fw-bold d-none d-md-inline">AQSO RESIDENCE Dashboard</span>
-            </Link>
             <Form className="navbar-search">
               <Form.Group id="topbarSearch">
                 <InputGroup className="input-group-merge search-bar">
