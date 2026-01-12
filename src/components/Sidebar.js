@@ -109,15 +109,6 @@ export default (props = {}) => {
               </Nav.Link>
             </div>
             <Nav className="flex-column pt-3 pt-md-0">
-             <div className="mb-4 text-center">
-               <Link to={Routes.DashboardOverview.path} onClick={() => setShow(false)}>
-                 <Image 
-                   src={LogoAQSO} 
-                   style={{ maxHeight: '40px', width: 'auto', cursor: 'pointer' }} 
-                 />
-               </Link>
-             </div>
-
               <NavItem title="Overview" link={Routes.DashboardOverview.path} icon={faChartPie} />
               <NavItem title="Data Penghuni" icon={faTable} link={Routes.UserTable.path} />
               <NavItem title="Data Kavling" icon={faMapPin} link={Routes.DataKavling.path} />
