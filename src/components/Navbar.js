@@ -11,8 +11,7 @@ import Profile3 from "../assets/img/team/profile-picture-3.jpg";
 import { Link } from "react-router-dom";
 import { Routes } from "../routes";
 
-// Logo dari public folder - dengan fallback jika tidak ada
-const LogoAQSO = process.env.PUBLIC_URL ? `${process.env.PUBLIC_URL}/logo.png` : "/logo.png";
+import LogoAQSO from "../assets/img/LOGO AQSO RESIDENCE REMOVE BG.png";
 
 
 
@@ -71,10 +70,6 @@ export default (props) => {
               <Image 
                 src={LogoAQSO} 
                 style={{ maxHeight: '40px', width: 'auto', marginRight: '10px' }} 
-                onError={(e) => {
-                  e.target.onerror = null;
-                  e.target.src = '/logo.png';
-                }}
               />
               <span className="text-white fw-bold d-none d-md-inline">AQSO RESIDENCE Dashboard</span>
             </Link>

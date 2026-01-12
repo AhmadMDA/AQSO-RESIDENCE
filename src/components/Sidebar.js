@@ -13,8 +13,7 @@ import { Routes } from "../routes";
 import ThemesbergLogo from "../assets/img/themesberg.svg";
 import ReactHero from "../assets/img/technologies/react-hero-logo.svg";
 import ProfilePicture from "../assets/img/team/profile-picture-3.jpg";
-// Logo dari public folder - dengan fallback jika tidak ada
-const LogoAQSO = process.env.PUBLIC_URL ? `${process.env.PUBLIC_URL}/logo.png` : "/logo.png";
+import LogoAQSO from "../assets/img/LOGO AQSO RESIDENCE REMOVE BG.png";
 
 export default (props = {}) => {
   const location = useLocation();
@@ -121,10 +120,6 @@ export default (props = {}) => {
                  <Image 
                    src={LogoAQSO} 
                    style={{ maxWidth: '150px', height: 'auto', cursor: 'pointer' }} 
-                   onError={(e) => {
-                     e.target.onerror = null;
-                     e.target.src = '/logo.png';
-                   }}
                  />
                </Link>
              </div>
