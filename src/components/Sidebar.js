@@ -115,7 +115,7 @@ export default (props = {}) => {
                    src={LogoAQSO} 
                    style={{ maxHeight: '50px', width: 'auto', marginRight: '10px' }} 
                  />
-                 <span className="text-white fw-bold" style={{ fontSize: '0.875rem' }}>AQSO RESIDENCE</span>
+                 <span className="text-white fw-bold" style={{ fontSize: '1rem' }}>AQSO RESIDENCE</span>
                </Link>
              </div>
 
