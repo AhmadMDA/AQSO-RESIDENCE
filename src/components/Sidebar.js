@@ -92,12 +92,6 @@ export default (props = {}) => {
       <CSSTransition timeout={300} in={show} classNames="sidebar-transition">
         <SimpleBar className={`collapse ${showClass} sidebar d-md-block bg-primary text-white`}>
           <div className="sidebar-inner px-4 pt-3">
-            {/* Tombol tutup sidebar untuk desktop */}
-            <div className="d-flex justify-content-end mb-3 d-md-block d-none">
-              <Nav.Link className="collapse-close" onClick={onCollapse} style={{ cursor: 'pointer', padding: '0.5rem' }}>
-                <FontAwesomeIcon icon={faTimes} className="text-white" />
-              </Nav.Link>
-            </div>
             <div className="user-card d-flex d-md-none align-items-center justify-content-between justify-content-md-center pb-4">
               <div className="d-flex align-items-center">
                 <div className="user-avatar lg-avatar me-4">
