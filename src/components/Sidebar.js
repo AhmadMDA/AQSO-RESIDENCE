@@ -13,7 +13,7 @@ import { Routes } from "../routes";
 import ThemesbergLogo from "../assets/img/themesberg.svg";
 import ReactHero from "../assets/img/technologies/react-hero-logo.svg";
 import ProfilePicture from "../assets/img/team/profile-picture-3.jpg";
-import LogoAQSO from "../assets/img/LOGO AQSO RESIDENCE REMOVE BG.png";
+import LogoAQSO from "../assets/img/LOGO AQSO RESIDENCE bg.png";
 
 export default (props = {}) => {
   const location = useLocation();
@@ -113,9 +113,9 @@ export default (props = {}) => {
                <Link to={Routes.DashboardOverview.path} onClick={() => setShow(false)} className="d-flex align-items-center text-decoration-none">
                  <Image 
                    src={LogoAQSO} 
-                   style={{ maxHeight: '40px', width: 'auto', marginRight: '10px' }} 
+                   style={{ maxHeight: '50px', width: 'auto', marginRight: '10px' }} 
                  />
-                 <span className="text-white fw-bold" style={{ fontSize: '0.875rem' }}>AQSO RESIDENCE Dashboard</span>
+                 <span className="text-white fw-bold" style={{ fontSize: '0.875rem' }}>AQSO RESIDENCE</span>
                </Link>
              </div>
 
