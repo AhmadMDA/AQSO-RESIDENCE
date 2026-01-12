@@ -11,7 +11,7 @@ import Profile3 from "../assets/img/team/profile-picture-3.jpg";
 import { Link } from "react-router-dom";
 import { Routes } from "../routes";
 
-import LogoAQSO from "../assets/img/LOGO AQSO RESIDENCE REMOVE BG.png";
+import LogoAQSO from "../assets/img/Gemini_Generated_Image_82909d82909d8290.png";
 
 
 

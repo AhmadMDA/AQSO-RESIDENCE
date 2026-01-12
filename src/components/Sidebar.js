@@ -13,7 +13,7 @@ import { Routes } from "../routes";
 import ThemesbergLogo from "../assets/img/themesberg.svg";
 import ReactHero from "../assets/img/technologies/react-hero-logo.svg";
 import ProfilePicture from "../assets/img/team/profile-picture-3.jpg";
-import LogoAQSO from "../assets/img/LOGO AQSO RESIDENCE REMOVE BG.png";
+import LogoAQSO from "../assets/img/Gemini_Generated_Image_82909d82909d8290.png";
 
 export default (props = {}) => {
   const location = useLocation();
