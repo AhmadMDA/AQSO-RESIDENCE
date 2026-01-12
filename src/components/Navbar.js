@@ -8,10 +8,11 @@ import { useHistory } from 'react-router-dom';
 
 // import NOTIFICATIONS_DATA from "../data/notifications";
 import Profile3 from "../assets/img/team/profile-picture-3.jpg";
-// Logo dari public folder
-const LogoAQSO = "/logo.png";
 import { Link } from "react-router-dom";
 import { Routes } from "../routes";
+
+// Logo dari public folder
+const LogoAQSO = "/logo.png";
 
 
 
