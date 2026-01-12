@@ -175,9 +175,9 @@ export default () => {
         setPendapatanPercentage(percent);
 
         // Agregasi data per bulan-tahun untuk tabel pendapatan
-        const pendapatanPerBulan = {};
+        const pendapatanTablePerBulan = {};
         
-        // Proses data kavling (DP + Cicilan) - agregasi per bulan
+        // Proses data kavling (DP + Cicilan) - agregasi per bulan untuk tabel
         kavlings.forEach(k => {
           const tgl_raw = k.tanggal_pembayaran || k.tanggal || k.createdAt || "";
           const tgl = tgl_raw ? new Date(tgl_raw) : null;
@@ -192,14 +192,14 @@ export default () => {
           else if (k.angsuran != null) cicilans = [Number(k.angsuran) || 0];
           const totalCicilan = cicilans.reduce((a,b)=>a+b,0);
           
-          if (!pendapatanPerBulan[bulanKey]) {
-            pendapatanPerBulan[bulanKey] = { dp: 0, cicilan: 0, investasi: 0, pengeluaran: 0 };
+          if (!pendapatanTablePerBulan[bulanKey]) {
+            pendapatanTablePerBulan[bulanKey] = { dp: 0, cicilan: 0, investasi: 0, pengeluaran: 0 };
           }
-          pendapatanPerBulan[bulanKey].dp += dp;
-          pendapatanPerBulan[bulanKey].cicilan += totalCicilan;
+          pendapatanTablePerBulan[bulanKey].dp += dp;
+          pendapatanTablePerBulan[bulanKey].cicilan += totalCicilan;
         });
         
-        // Proses data kas - Investasi (uangMasuk) dan Pengeluaran (harga) - agregasi per bulan
+        // Proses data kas - Investasi (uangMasuk) dan Pengeluaran (harga) - agregasi per bulan untuk tabel
         kasData.forEach(kas => {
           const tgl_raw = kas.tanggal || "";
           const tgl = tgl_raw ? new Date(tgl_raw) : null;
@@ -209,19 +209,19 @@ export default () => {
           const investasi = Number(kas.uangMasuk) || 0;
           const pengeluaran = Number(kas.harga) || 0;
           
-          if (!pendapatanPerBulan[bulanKey]) {
-            pendapatanPerBulan[bulanKey] = { dp: 0, cicilan: 0, investasi: 0, pengeluaran: 0 };
+          if (!pendapatanTablePerBulan[bulanKey]) {
+            pendapatanTablePerBulan[bulanKey] = { dp: 0, cicilan: 0, investasi: 0, pengeluaran: 0 };
           }
-          pendapatanPerBulan[bulanKey].investasi += investasi;
-          pendapatanPerBulan[bulanKey].pengeluaran += pengeluaran;
+          pendapatanTablePerBulan[bulanKey].investasi += investasi;
+          pendapatanTablePerBulan[bulanKey].pengeluaran += pengeluaran;
         });
         
         // Convert ke array untuk tabel pendapatan
-        const pendapatanTableData = Object.keys(pendapatanPerBulan)
+        const pendapatanTableData = Object.keys(pendapatanTablePerBulan)
           .map(bulanKey => {
             const [year, month] = bulanKey.split('-');
             const bulanTahun = `${new Date(year, parseInt(month)-1, 1).toLocaleString('id-ID', { month: 'long' })} ${year}`;
-            const data = pendapatanPerBulan[bulanKey];
+            const data = pendapatanTablePerBulan[bulanKey];
             const totalPendapatan = data.dp + data.cicilan + data.investasi + data.pengeluaran;
             
             return {
