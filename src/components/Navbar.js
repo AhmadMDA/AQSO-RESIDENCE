@@ -11,8 +11,8 @@ import Profile3 from "../assets/img/team/profile-picture-3.jpg";
 import { Link } from "react-router-dom";
 import { Routes } from "../routes";
 
-// Logo dari public folder
-const LogoAQSO = "/logo.png";
+// Logo dari public folder - dengan fallback jika tidak ada
+const LogoAQSO = process.env.PUBLIC_URL ? `${process.env.PUBLIC_URL}/logo.png` : "/logo.png";
 
 
 
@@ -68,7 +68,14 @@ export default (props) => {
           <div className="d-flex align-items-center">
             {/* Logo AQSO RESIDENCE */}
             <Link to={Routes.DashboardOverview.path} className="me-3 d-flex align-items-center text-decoration-none">
-              <Image src={LogoAQSO} style={{ maxHeight: '40px', width: 'auto', marginRight: '10px' }} />
+              <Image 
+                src={LogoAQSO} 
+                style={{ maxHeight: '40px', width: 'auto', marginRight: '10px' }} 
+                onError={(e) => {
+                  e.target.onerror = null;
+                  e.target.src = '/logo.png';
+                }}
+              />
               <span className="text-white fw-bold d-none d-md-inline">AQSO RESIDENCE Dashboard</span>
             </Link>
             <Form className="navbar-search">
