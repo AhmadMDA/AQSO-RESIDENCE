@@ -35,7 +35,8 @@ export default () => {
   const [errors, setErrors] = useState({});
   const [form, setForm] = useState({
     tanggal: new Date().toISOString().slice(0, 10),
-    nama: '',
+    nama: 'Investasi', // default
+    namaLainnya: '',
     ketTidakMasuk: '',
     uangMasuk: '',
     ketBelanja: '',
@@ -90,7 +91,8 @@ export default () => {
     setEditingId(entry.id);
     setForm({
       tanggal: entry.tanggal || new Date().toISOString().slice(0, 10),
-      nama: entry.nama || '',
+      nama: (entry.nama === 'Investasi' || entry.nama === 'Pengeluaran' || entry.nama === 'Lainnya') ? entry.nama : (entry.nama ? 'Lainnya' : 'Investasi'),
+      namaLainnya: (entry.nama !== 'Investasi' && entry.nama !== 'Pengeluaran' && entry.nama !== 'Lainnya') ? entry.nama : '',
       ketTidakMasuk: entry.ketTidakMasuk || '',
       uangMasuk: entry.uangMasuk != null ? String(entry.uangMasuk) : '',
       ketBelanja: entry.ketBelanja || '',
@@ -116,13 +118,14 @@ export default () => {
     const err = {};
     if (!form.tanggal) err.tanggal = 'Tanggal wajib diisi';
     if (!form.nama || !form.nama.trim()) err.nama = 'Nama wajib diisi';
+    if (form.nama === 'Lainnya' && (!form.namaLainnya || !form.namaLainnya.trim())) err.namaLainnya = 'Nama lainnya wajib diisi';
     setErrors(err);
     return Object.keys(err).length === 0;
   };
 
   const buildPayload = () => ({
     tanggal: form.tanggal,
-    nama: form.nama,
+    nama: form.nama === 'Lainnya' ? form.namaLainnya : form.nama,
     ketTidakMasuk: form.ketTidakMasuk,
     uangMasuk: form.uangMasuk ? parseFloat(form.uangMasuk) : 0,
     ketBelanja: form.ketBelanja,
@@ -371,12 +374,27 @@ export default () => {
               <Col md={6}>
                 <Form.Group className="mb-3">
                   <Form.Label>Nama <span className="text-danger">*</span></Form.Label>
-                  <Form.Control
+                  <Form.Select
                     name="nama"
                     value={form.nama}
                     onChange={handleChange}
                     isInvalid={!!errors.nama}
-                  />
+                  >
+                    <option value="Investasi">Investasi</option>
+                    <option value="Pengeluaran">Pengeluaran</option>
+                    <option value="Lainnya">Lainnya</option>
+                  </Form.Select>
+                  {form.nama === 'Lainnya' && (
+                    <Form.Control
+                      className="mt-2"
+                      name="namaLainnya"
+                      placeholder="Masukkan nama lain..."
+                      value={form.namaLainnya}
+                      onChange={handleChange}
+                      isInvalid={!!errors.namaLainnya}
+                    />
+                  )}
+                  {errors.namaLainnya && <div className="invalid-feedback d-block">{errors.namaLainnya}</div>}
                 </Form.Group>
               </Col>
             </Row>

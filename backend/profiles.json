@@ -1,1 +1,14 @@
-{}
+{
+	"admin@admin.com": {
+		"nama": "Admin AQSO",
+		"alamat": "Jl. Admin No. 1, Jakarta",
+		"no_telpon": "08123456789",
+		"foto_profil": null
+	},
+	"pemilik@pemilik.com": {
+		"nama": "Pemilik AQSO",
+		"alamat": "Jl. Pemilik No. 2, Jakarta",
+		"no_telpon": "08234567890",
+		"foto_profil": null
+	}
+}

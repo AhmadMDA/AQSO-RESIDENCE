@@ -12,6 +12,31 @@ import {
 import { trafficShares, totalOrders } from "../../data/charts";
 import { Card, Table } from '@themesberg/react-bootstrap';
 
+// Helper untuk parsing string rupiah (misal: 'Rp 10.000.000' => 10000000)
+function parseRupiah(val) {
+  if (typeof val === 'number') return val;
+  if (!val || val === '-' || val === null) return 0;
+  if (typeof val === 'string') {
+    // Hilangkan Rp, titik, spasi
+    const cleaned = val.replace(/[^\d]/g, '');
+    return Number(cleaned) || 0;
+  }
+  return 0;
+}
+import React, { useRef, useEffect, useState } from "react";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faCashRegister, faChartLine, faCloudUploadAlt, faDesktop, faMobileAlt, faTabletAlt } from '@fortawesome/free-solid-svg-icons';
+import { Col, Row, Button, Dropdown, ButtonGroup } from '@themesberg/react-bootstrap';
+
+import { 
+  CounterWidget, CircleChartWidget, BarChartWidget, TeamMembersWidget, 
+  ProgressTrackWidget, RankingWidget, SalesValueWidget, SalesValueWidgetPhone, 
+  AcquisitionWidget 
+} from "../../components/Widgets";
+
+import { trafficShares, totalOrders } from "../../data/charts";
+import { Card, Table } from '@themesberg/react-bootstrap';
+
 export default () => {
   
   const fileInputRef = useRef(null);
@@ -100,187 +125,122 @@ export default () => {
     // Fetch dan hitung pendapatan + pengeluaran
     async function fetchPendapatanDanPengeluaran() {
       try {
-        // Fetch data kavling dan kas secara paralel
         const [kavlingRes, kasRes] = await Promise.all([
           fetch("http://localhost:4000/api/kavlings"),
           fetch("http://localhost:4000/api/kas")
         ]);
-        
         if (!kavlingRes.ok) throw new Error("Failed to fetch kavlings");
         if (!kasRes.ok) throw new Error("Failed to fetch kas");
-        
         const kavlings = await kavlingRes.json();
         const kasData = await kasRes.json();
-        
-        const now = new Date();
-        const bulanIni = now.getMonth(), tahunIni = now.getFullYear();
-        const bulanLalu = (bulanIni === 0 ? 11 : bulanIni - 1);
-        const tahunLalu = (bulanIni === 0 ? tahunIni - 1 : tahunIni);
-        let totalThisMonth = 0;
-        let totalLastMonth = 0;
 
-        // ----------- CHART DATA per bulan -----------
-        const pendapatanPerBulan = {};
-        
-        // Proses data kavling (DP + Cicilan)
+        // --- AGREGASI DATA PER BULAN ---
+        // Format: { [bulanKey]: { dp, cicilan, investasi, pengeluaran, keteranganPengeluaran: Set } }
+        const rekapPerBulan = {};
+
+        // 1. Proses Data Kavling (DP & Cicilan)
         kavlings.forEach(k => {
+          // Tanggal pembayaran: gunakan field 'tanggal_pembayaran' jika ada, jika tidak pakai 'tanggal' (fallback)
           const tgl_raw = k.tanggal_pembayaran || k.tanggal || k.createdAt || "";
           const tgl = tgl_raw ? new Date(tgl_raw) : null;
           if (!tgl || isNaN(tgl)) return;
-          
-          const dp = Number(k.pembayaran_dp != null ? k.pembayaran_dp : (k.dp != null ? k.dp : 0)) || 0;
-          let cicilans = [];
-          if (Array.isArray(k.pembayaran_cicilan)) cicilans = k.pembayaran_cicilan.map(c => Number(c) || 0);
-          else if (Array.isArray(k.angsuran)) cicilans = k.angsuran.map(c => Number(c) || 0);
-          else if (k.pembayaran_cicilan != null) cicilans = [Number(k.pembayaran_cicilan) || 0];
-          else if (k.angsuran != null) cicilans = [Number(k.angsuran) || 0];
-          
-          const key = `${tgl.getFullYear()}-${(tgl.getMonth()+1).toString().padStart(2,'0')}`;
-          pendapatanPerBulan[key] = (pendapatanPerBulan[key]||0) + dp + cicilans.reduce((a,b)=>a+b,0);
-          
-          if (tgl.getMonth() === bulanIni && tgl.getFullYear() === tahunIni) {
-            totalThisMonth += dp + cicilans.reduce((a,b)=>a+b,0);
-          } else if (tgl.getMonth() === bulanLalu && tgl.getFullYear() === tahunLalu) {
-            totalLastMonth += dp + cicilans.reduce((a,b)=>a+b,0);
+          const bulanKey = `${tgl.getFullYear()}-${(tgl.getMonth()+1).toString().padStart(2,'0')}`;
+          if (!rekapPerBulan[bulanKey]) {
+            rekapPerBulan[bulanKey] = { dp: 0, cicilan: 0, investasi: 0, pengeluaran: 0, keteranganPengeluaran: new Set() };
           }
+          // DP: gunakan field 'pembayaran_dp' atau 'dp' atau 'PEMBAYARAN_DP'
+          const dp = parseRupiah(k.pembayaran_dp || k.dp || k.PEMBAYARAN_DP || 0);
+          rekapPerBulan[bulanKey].dp += dp;
+          // Cicilan: ambil dari pembayaran_1, pembayaran_2, pembayaran_3, pembayaran_4, pembayaran_5 jika ada
+          let cicilan = 0;
+          for (let i = 1; i <= 5; i++) {
+            const key = `pembayaran_${i}`;
+            if (k[key]) {
+              cicilan += parseRupiah(k[key]);
+            }
+          }
+          rekapPerBulan[bulanKey].cicilan += cicilan;
         });
-        
-        // Proses data kas (Investasi dari uangMasuk)
+
+        // 2. Proses Data Kas (Investasi & Pengeluaran)
         kasData.forEach(kas => {
-          const tgl_raw = kas.tanggal || "";
+          const tgl_raw = kas.tanggal || kas.createdAt || "";
           const tgl = tgl_raw ? new Date(tgl_raw) : null;
           if (!tgl || isNaN(tgl)) return;
-          
-          const investasi = Number(kas.uangMasuk) || 0;
-          const key = `${tgl.getFullYear()}-${(tgl.getMonth()+1).toString().padStart(2,'0')}`;
-          pendapatanPerBulan[key] = (pendapatanPerBulan[key]||0) + investasi;
-          
-          if (tgl.getMonth() === bulanIni && tgl.getFullYear() === tahunIni) {
-            totalThisMonth += investasi;
-          } else if (tgl.getMonth() === bulanLalu && tgl.getFullYear() === tahunLalu) {
-            totalLastMonth += investasi;
+          const bulanKey = `${tgl.getFullYear()}-${(tgl.getMonth()+1).toString().padStart(2,'0')}`;
+          if (!rekapPerBulan[bulanKey]) {
+            rekapPerBulan[bulanKey] = { dp: 0, cicilan: 0, investasi: 0, pengeluaran: 0, keteranganPengeluaran: new Set() };
+          }
+          // Investasi: nama mengandung "investasi"
+          if (kas.nama && kas.nama.toLowerCase().includes('investasi')) {
+            const investasi = parseRupiah(kas.uangMasuk || kas.uang_masuk || 0);
+            rekapPerBulan[bulanKey].investasi += investasi;
+          }
+          // Pengeluaran: jika harga > 0
+          const hargaPengeluaran = parseRupiah(kas.harga || kas.HARGA || 0);
+          if (hargaPengeluaran > 0) {
+            rekapPerBulan[bulanKey].pengeluaran += hargaPengeluaran;
+            if (kas.nama) rekapPerBulan[bulanKey].keteranganPengeluaran.add(kas.nama);
           }
         });
 
-        // Generate chart format
-        const sortedKeys = Object.keys(pendapatanPerBulan).sort();
+        // 3. Generate Data Tabel Pendapatan & Pengeluaran
+        const sortedKeys = Object.keys(rekapPerBulan).sort((a, b) => b.localeCompare(a));
+
+        // Data Tabel Pendapatan
+        const pendapatanTableData = sortedKeys.map(bulanKey => {
+          const [year, month] = bulanKey.split('-');
+          const bulanTahun = `${new Date(year, parseInt(month)-1, 1).toLocaleString('id-ID', { month: 'long' })} ${year}`;
+          const data = rekapPerBulan[bulanKey];
+          const totalPendapatan = (data.dp || 0) + (data.cicilan || 0) + (data.investasi || 0) - (data.pengeluaran || 0);
+          return {
+            id: bulanKey,
+            tanggal: bulanTahun,
+            tanggalSort: new Date(year, parseInt(month)-1, 1).getTime(),
+            dp: data.dp || 0,
+            cicilan: data.cicilan || 0,
+            investasi: data.investasi || 0,
+            pengeluaran: data.pengeluaran || 0,
+            totalPendapatan: totalPendapatan
+          };
+        }).filter(item => item.dp > 0 || item.cicilan > 0 || item.investasi > 0 || item.pengeluaran > 0);
+        setPendapatanTableData(pendapatanTableData);
+
+        // Data Tabel Pengeluaran
+        const pengeluaranData = sortedKeys.map(bulanKey => {
+          const [year, month] = bulanKey.split('-');
+          const bulanTahun = `${new Date(year, parseInt(month)-1, 1).toLocaleString('id-ID', { month: 'long' })} ${year}`;
+          const data = rekapPerBulan[bulanKey];
+          const keteranganStr = Array.from(data.keteranganPengeluaran).join(', ') || '-';
+          return {
+            id: bulanKey,
+            tanggal: bulanTahun,
+            tanggalSort: new Date(year, parseInt(month)-1, 1).getTime(),
+            keterangan: keteranganStr,
+            jumlah: data.pengeluaran || 0
+          };
+        }).filter(item => item.jumlah > 0);
+        setPengeluaranTableData(pengeluaranData);
+
+        // Total pengeluaran (untuk widget ringkasan)
+        const totalPengeluaranVal = pengeluaranData.reduce((sum, curr) => sum + (curr.jumlah || 0), 0);
+        setTotalPengeluaran(totalPengeluaranVal);
+
+        // Untuk chart bulanan (jika ingin menampilkan total pendapatan per bulan)
         const chartLabels = sortedKeys.map(key => {
           const [y,m]=key.split('-');
           return `${new Date(y,parseInt(m)-1,1).toLocaleString('default',{month:'short'})} ${y}`;
         });
-        const chartSeries = [sortedKeys.map(k=>pendapatanPerBulan[k])];
+        const chartSeries = [sortedKeys.map(k=>{
+          const d = rekapPerBulan[k];
+          return (d.dp||0)+(d.cicilan||0)+(d.investasi||0)-(d.pengeluaran||0);
+        })];
         setPendapatanChartData({labels: chartLabels, series: chartSeries});
-        setPendapatan(totalThisMonth);
-        let percent = totalLastMonth === 0 ? (totalThisMonth > 0 ? 100 : 0) : (((totalThisMonth-totalLastMonth)/totalLastMonth)*100).toFixed(1);
+        setPendapatan(pendapatanTableData.length > 0 ? pendapatanTableData[0].totalPendapatan : 0);
+        let percent = pendapatanTableData.length > 1 && pendapatanTableData[1].totalPendapatan !== 0
+          ? (((pendapatanTableData[0].totalPendapatan - pendapatanTableData[1].totalPendapatan) / pendapatanTableData[1].totalPendapatan) * 100).toFixed(1)
+          : (pendapatanTableData[0]?.totalPendapatan > 0 ? 100 : 0);
         setPendapatanPercentage(percent);
-
-        // --- AGREGASI TABEL PENDAPATAN ---
-        // Format: { [bulanKey]: { dp, cicilan, investasi } }
-        const pendapatanTablePerBulan = {};
-        kavlings.forEach(k => {
-          const tgl_raw = k.tanggal_pembayaran || k.tanggal || k.createdAt || "";
-          const tgl = tgl_raw ? new Date(tgl_raw) : null;
-          if (!tgl || isNaN(tgl)) return;
-          const bulanKey = `${tgl.getFullYear()}-${(tgl.getMonth()+1).toString().padStart(2,'0')}`;
-          const dp = Number(k.pembayaran_dp != null ? k.pembayaran_dp : (k.dp != null ? k.dp : 0)) || 0;
-          let cicilans = [];
-          if (Array.isArray(k.pembayaran_cicilan)) cicilans = k.pembayaran_cicilan.map(c => Number(c) || 0);
-          else if (Array.isArray(k.angsuran)) cicilans = k.angsuran.map(c => Number(c) || 0);
-          else if (k.pembayaran_cicilan != null) cicilans = [Number(k.pembayaran_cicilan) || 0];
-          else if (k.angsuran != null) cicilans = [Number(k.angsuran) || 0];
-          const totalCicilan = cicilans.reduce((a,b)=>a+b,0);
-          if (!pendapatanTablePerBulan[bulanKey]) {
-            pendapatanTablePerBulan[bulanKey] = { dp: 0, cicilan: 0, investasi: 0 };
-          }
-          pendapatanTablePerBulan[bulanKey].dp += dp;
-          pendapatanTablePerBulan[bulanKey].cicilan += totalCicilan;
-        });
-        // Investasi dari kas: nama mengandung "investasi" (case-insensitive)
-        kasData.forEach(kas => {
-          const tgl_raw = kas.tanggal || "";
-          const tgl = tgl_raw ? new Date(tgl_raw) : null;
-          if (!tgl || isNaN(tgl)) return;
-          const bulanKey = `${tgl.getFullYear()}-${(tgl.getMonth()+1).toString().padStart(2,'0')}`;
-          const isInvestasi = kas.nama && kas.nama.toLowerCase().includes('investasi');
-          if (isInvestasi) {
-            const investasi = Number(kas.uangMasuk) || 0;
-            if (!pendapatanTablePerBulan[bulanKey]) {
-              pendapatanTablePerBulan[bulanKey] = { dp: 0, cicilan: 0, investasi: 0 };
-            }
-            pendapatanTablePerBulan[bulanKey].investasi += investasi;
-          }
-        });
-        // Convert ke array untuk tabel pendapatan
-        // Gabungkan pengeluaran per bulan ke pendapatanTablePerBulan
-        Object.keys(pengeluaranPerBulan).forEach(bulanKey => {
-          const pengeluaran = pengeluaranPerBulan[bulanKey]?.jumlah || 0;
-          if (!pendapatanTablePerBulan[bulanKey]) {
-            pendapatanTablePerBulan[bulanKey] = { dp: 0, cicilan: 0, investasi: 0, pengeluaran: 0 };
-          }
-          pendapatanTablePerBulan[bulanKey].pengeluaran = pengeluaran;
-        });
-
-        const pendapatanTableData = Object.keys(pendapatanTablePerBulan)
-          .map(bulanKey => {
-            const [year, month] = bulanKey.split('-');
-            const bulanTahun = `${new Date(year, parseInt(month)-1, 1).toLocaleString('id-ID', { month: 'long' })} ${year}`;
-            const data = pendapatanTablePerBulan[bulanKey];
-            const totalPendapatan = (data.dp || 0) + (data.cicilan || 0) + (data.investasi || 0) + (data.pengeluaran || 0);
-            return {
-              id: bulanKey,
-              tanggal: bulanTahun,
-              tanggalSort: new Date(year, parseInt(month)-1, 1).getTime(),
-              dp: data.dp || 0,
-              cicilan: data.cicilan || 0,
-              investasi: data.investasi || 0,
-              pengeluaran: data.pengeluaran || 0,
-              totalPendapatan: totalPendapatan
-            };
-          })
-          .filter(item => item.totalPendapatan > 0)
-          .sort((a, b) => b.tanggalSort - a.tanggalSort)
-          .slice(0, 10);
-        setPendapatanTableData(pendapatanTableData);
-
-        // --- AGREGASI TABEL PENGELUARAN ---
-        // Format: { [bulanKey]: { keterangan: Set, jumlah: number } }
-        const pengeluaranPerBulan = {};
-        kasData.forEach(kas => {
-          const tgl_raw = kas.tanggal || "";
-          const tgl = tgl_raw ? new Date(tgl_raw) : null;
-          if (!tgl || isNaN(tgl)) return;
-          const isPengeluaran = kas.nama && kas.nama.toLowerCase().includes('pengeluaran');
-          const harga = Number(kas.harga) || 0;
-          if (!isPengeluaran || harga <= 0) return;
-          const bulanKey = `${tgl.getFullYear()}-${(tgl.getMonth()+1).toString().padStart(2,'0')}`;
-          if (!pengeluaranPerBulan[bulanKey]) {
-            pengeluaranPerBulan[bulanKey] = { keterangan: new Set(), jumlah: 0 };
-          }
-          pengeluaranPerBulan[bulanKey].keterangan.add(kas.nama);
-          pengeluaranPerBulan[bulanKey].jumlah += harga;
-        });
-        // Convert ke array untuk tabel pengeluaran
-        const pengeluaranData = Object.keys(pengeluaranPerBulan)
-          .map(bulanKey => {
-            const [year, month] = bulanKey.split('-');
-            const bulanTahun = `${new Date(year, parseInt(month)-1, 1).toLocaleString('id-ID', { month: 'long' })} ${year}`;
-            const data = pengeluaranPerBulan[bulanKey];
-            const keteranganStr = Array.from(data.keterangan).join(', ') || 'Pengeluaran';
-            return {
-              id: bulanKey,
-              tanggal: bulanTahun,
-              tanggalSort: new Date(year, parseInt(month)-1, 1).getTime(),
-              keterangan: keteranganStr,
-              jumlah: data.jumlah
-            };
-          })
-          .filter(item => item.jumlah > 0)
-          .sort((a, b) => b.tanggalSort - a.tanggalSort)
-          .slice(0, 10);
-        setPengeluaranTableData(pengeluaranData);
-        // Hitung total pengeluaran
-        const totalPengeluaranVal = pengeluaranData.reduce((sum, curr) => sum + (curr.jumlah || 0), 0);
-        setTotalPengeluaran(totalPengeluaranVal);
 
       } catch (err) {
         console.error('Gagal fetch data:', err);
