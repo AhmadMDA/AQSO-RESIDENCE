@@ -211,19 +211,29 @@ export default () => {
           }
         });
         // Convert ke array untuk tabel pendapatan
+        // Gabungkan pengeluaran per bulan ke pendapatanTablePerBulan
+        Object.keys(pengeluaranPerBulan).forEach(bulanKey => {
+          const pengeluaran = pengeluaranPerBulan[bulanKey]?.jumlah || 0;
+          if (!pendapatanTablePerBulan[bulanKey]) {
+            pendapatanTablePerBulan[bulanKey] = { dp: 0, cicilan: 0, investasi: 0, pengeluaran: 0 };
+          }
+          pendapatanTablePerBulan[bulanKey].pengeluaran = pengeluaran;
+        });
+
         const pendapatanTableData = Object.keys(pendapatanTablePerBulan)
           .map(bulanKey => {
             const [year, month] = bulanKey.split('-');
             const bulanTahun = `${new Date(year, parseInt(month)-1, 1).toLocaleString('id-ID', { month: 'long' })} ${year}`;
             const data = pendapatanTablePerBulan[bulanKey];
-            const totalPendapatan = data.dp + data.cicilan + data.investasi;
+            const totalPendapatan = (data.dp || 0) + (data.cicilan || 0) + (data.investasi || 0) + (data.pengeluaran || 0);
             return {
               id: bulanKey,
               tanggal: bulanTahun,
               tanggalSort: new Date(year, parseInt(month)-1, 1).getTime(),
-              dp: data.dp,
-              cicilan: data.cicilan,
-              investasi: data.investasi,
+              dp: data.dp || 0,
+              cicilan: data.cicilan || 0,
+              investasi: data.investasi || 0,
+              pengeluaran: data.pengeluaran || 0,
               totalPendapatan: totalPendapatan
             };
           })
