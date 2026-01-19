@@ -384,7 +384,18 @@ export default () => {
     ? Math.max(...kavlings.map(k => Array.isArray(k.pembayaran_cicilan) ? k.pembayaran_cicilan.length : 0))
     : 0;
 
-  const filtered = kavlings;
+  // Search state
+  const [search, setSearch] = useState("");
+  const filtered = kavlings.filter(k => {
+    if (!search) return true;
+    const s = search.toLowerCase();
+    return (
+      (k.nama && k.nama.toLowerCase().includes(s)) ||
+      (k.no_kk && k.no_kk.toLowerCase().includes(s)) ||
+      (k.no_nik && k.no_nik.toLowerCase().includes(s)) ||
+      (k.ukuran_kavling && k.ukuran_kavling.toLowerCase().includes(s))
+    );
+  });
 
   return (
     <>
@@ -395,7 +406,15 @@ export default () => {
             <Breadcrumb.Item active>Data Kavling</Breadcrumb.Item>
           </Breadcrumb>
           <h4>Data Kavling</h4>
-          <p className="mb-0">Daftar data kavling dengan informasi pembayaran.</p>
+          <p className="mb-2">Daftar data kavling dengan informasi pembayaran.</p>
+          <Form.Control
+            type="text"
+            placeholder="Cari nama, no KK, no NIK, atau ukuran kavling..."
+            value={search}
+            onChange={e => setSearch(e.target.value)}
+            style={{ maxWidth: 320 }}
+            className="mt-2"
+          />
         </div>
 
         <div className="btn-toolbar mb-2 mb-md-0">
