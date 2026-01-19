@@ -88,11 +88,10 @@ const RouteWithSidebar = ({ component: Component, ...rest }) => {
 
   return (
     <Route {...rest} render={props => {
-      // Authentication check disabled temporarily
-      // const raw = localStorage.getItem('authUser');
-      // if (!raw) {
-      //   return (<Redirect to={Routes.Signin.path} />);
-      // }
+      const raw = localStorage.getItem('authUser');
+      if (!raw) {
+        return (<Redirect to={Routes.Signin.path} />);
+      }
       return (
         <>
           <Preloader show={loaded ? false : true} />
@@ -112,16 +111,15 @@ const RouteWithSidebar = ({ component: Component, ...rest }) => {
 const RouteWithRole = ({ component: Component, allowedRoles = [], ...rest }) => {
   return (
     <Route {...rest} render={props => {
-      // Authentication and role check disabled temporarily
-      // const raw = localStorage.getItem('authUser');
-      // if (!raw) {
-      //   return (<Redirect to={Routes.Signin.path} />);
-      // }
-      // try {
-      //   const user = JSON.parse(raw);
-      //   if (allowedRoles.length && !allowedRoles.includes(user.role)) {
-      //     return (<Redirect to={Routes.NotFound.path} />);
-      //   }
+      const raw = localStorage.getItem('authUser');
+      if (!raw) {
+        return (<Redirect to={Routes.Signin.path} />);
+      }
+      try {
+        const user = JSON.parse(raw);
+        if (allowedRoles.length && !allowedRoles.includes(user.role)) {
+          return (<Redirect to={Routes.NotFound.path} />);
+        }
         return (
           <>
             <Preloader show={false} />
@@ -133,16 +131,16 @@ const RouteWithRole = ({ component: Component, allowedRoles = [], ...rest }) => 
             </main>
           </>
         );
-      // } catch (e) {
-      //   return (<Redirect to={Routes.Signin.path} />);
-      // }
+      } catch (e) {
+        return (<Redirect to={Routes.Signin.path} />);
+      }
     }} />
   );
 };
 
 export default () => (
   <Switch>
-    <RouteWithLoader exact path="/" component={() => <Redirect to={Routes.DashboardOverview.path} />} />
+    <RouteWithLoader exact path="/" component={() => <Redirect to={Routes.Signin.path} />} />
     <RouteWithLoader exact path={Routes.Signin.path} component={Signin} />
     <RouteWithLoader exact path={Routes.Signup.path} component={Signup} />
     <RouteWithLoader exact path={Routes.ForgotPassword.path} component={ForgotPassword} />
@@ -160,6 +158,8 @@ export default () => (
     <RouteWithRole exact path={Routes.RoleManagement.path} component={RoleManagement} allowedRoles={["pemilik"]} />
     <RouteWithSidebar exact path={Routes.BootstrapTables.path} component={BootstrapTables} />
     <RouteWithSidebar exact path={Routes.UserTable.path} component={UserTable} />
+
+    {/* Data Kavling & Data Kas */}
     <RouteWithSidebar exact path={Routes.DataKavling.path} component={DataKavling} />
     <RouteWithSidebar exact path={Routes.DataKas.path} component={DataKas} />
 

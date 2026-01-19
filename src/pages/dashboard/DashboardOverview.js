@@ -174,15 +174,13 @@ export default () => {
         let percent = totalLastMonth === 0 ? (totalThisMonth > 0 ? 100 : 0) : (((totalThisMonth-totalLastMonth)/totalLastMonth)*100).toFixed(1);
         setPendapatanPercentage(percent);
 
-        // Agregasi data per bulan-tahun untuk tabel pendapatan
+        // --- AGREGASI TABEL PENDAPATAN ---
+        // Format: { [bulanKey]: { dp, cicilan, investasi } }
         const pendapatanTablePerBulan = {};
-        
-        // Proses data kavling (DP + Cicilan) - agregasi per bulan untuk tabel
         kavlings.forEach(k => {
           const tgl_raw = k.tanggal_pembayaran || k.tanggal || k.createdAt || "";
           const tgl = tgl_raw ? new Date(tgl_raw) : null;
           if (!tgl || isNaN(tgl)) return;
-          
           const bulanKey = `${tgl.getFullYear()}-${(tgl.getMonth()+1).toString().padStart(2,'0')}`;
           const dp = Number(k.pembayaran_dp != null ? k.pembayaran_dp : (k.dp != null ? k.dp : 0)) || 0;
           let cicilans = [];
@@ -191,39 +189,34 @@ export default () => {
           else if (k.pembayaran_cicilan != null) cicilans = [Number(k.pembayaran_cicilan) || 0];
           else if (k.angsuran != null) cicilans = [Number(k.angsuran) || 0];
           const totalCicilan = cicilans.reduce((a,b)=>a+b,0);
-          
           if (!pendapatanTablePerBulan[bulanKey]) {
-            pendapatanTablePerBulan[bulanKey] = { dp: 0, cicilan: 0, investasi: 0, pengeluaran: 0 };
+            pendapatanTablePerBulan[bulanKey] = { dp: 0, cicilan: 0, investasi: 0 };
           }
           pendapatanTablePerBulan[bulanKey].dp += dp;
           pendapatanTablePerBulan[bulanKey].cicilan += totalCicilan;
         });
-        
-        // Proses data kas - Investasi (uangMasuk) dan Pengeluaran (harga) - agregasi per bulan untuk tabel
+        // Investasi dari kas: nama mengandung "investasi" (case-insensitive)
         kasData.forEach(kas => {
           const tgl_raw = kas.tanggal || "";
           const tgl = tgl_raw ? new Date(tgl_raw) : null;
           if (!tgl || isNaN(tgl)) return;
-          
           const bulanKey = `${tgl.getFullYear()}-${(tgl.getMonth()+1).toString().padStart(2,'0')}`;
-          const investasi = Number(kas.uangMasuk) || 0;
-          const pengeluaran = Number(kas.harga) || 0;
-          
-          if (!pendapatanTablePerBulan[bulanKey]) {
-            pendapatanTablePerBulan[bulanKey] = { dp: 0, cicilan: 0, investasi: 0, pengeluaran: 0 };
+          const isInvestasi = kas.nama && kas.nama.toLowerCase().includes('investasi');
+          if (isInvestasi) {
+            const investasi = Number(kas.uangMasuk) || 0;
+            if (!pendapatanTablePerBulan[bulanKey]) {
+              pendapatanTablePerBulan[bulanKey] = { dp: 0, cicilan: 0, investasi: 0 };
+            }
+            pendapatanTablePerBulan[bulanKey].investasi += investasi;
           }
-          pendapatanTablePerBulan[bulanKey].investasi += investasi;
-          pendapatanTablePerBulan[bulanKey].pengeluaran += pengeluaran;
         });
-        
         // Convert ke array untuk tabel pendapatan
         const pendapatanTableData = Object.keys(pendapatanTablePerBulan)
           .map(bulanKey => {
             const [year, month] = bulanKey.split('-');
             const bulanTahun = `${new Date(year, parseInt(month)-1, 1).toLocaleString('id-ID', { month: 'long' })} ${year}`;
             const data = pendapatanTablePerBulan[bulanKey];
-            const totalPendapatan = data.dp + data.cicilan + data.investasi + data.pengeluaran;
-            
+            const totalPendapatan = data.dp + data.cicilan + data.investasi;
             return {
               id: bulanKey,
               tanggal: bulanTahun,
@@ -231,52 +224,38 @@ export default () => {
               dp: data.dp,
               cicilan: data.cicilan,
               investasi: data.investasi,
-              pengeluaran: data.pengeluaran,
               totalPendapatan: totalPendapatan
             };
           })
           .filter(item => item.totalPendapatan > 0)
           .sort((a, b) => b.tanggalSort - a.tanggalSort)
           .slice(0, 10);
-        
         setPendapatanTableData(pendapatanTableData);
 
-        // Agregasi data pengeluaran per bulan-tahun
+        // --- AGREGASI TABEL PENGELUARAN ---
+        // Format: { [bulanKey]: { keterangan: Set, jumlah: number } }
         const pengeluaranPerBulan = {};
-        
         kasData.forEach(kas => {
           const tgl_raw = kas.tanggal || "";
           const tgl = tgl_raw ? new Date(tgl_raw) : null;
           if (!tgl || isNaN(tgl)) return;
-          
+          const isPengeluaran = kas.nama && kas.nama.toLowerCase().includes('pengeluaran');
           const harga = Number(kas.harga) || 0;
-          if (harga <= 0) return;
-          
+          if (!isPengeluaran || harga <= 0) return;
           const bulanKey = `${tgl.getFullYear()}-${(tgl.getMonth()+1).toString().padStart(2,'0')}`;
-          const ketBelanja = kas.ketBelanja || '-';
-          
           if (!pengeluaranPerBulan[bulanKey]) {
-            pengeluaranPerBulan[bulanKey] = {
-              keterangan: [],
-              jumlah: 0
-            };
+            pengeluaranPerBulan[bulanKey] = { keterangan: new Set(), jumlah: 0 };
           }
-          if (ketBelanja !== '-' && !pengeluaranPerBulan[bulanKey].keterangan.includes(ketBelanja)) {
-            pengeluaranPerBulan[bulanKey].keterangan.push(ketBelanja);
-          }
+          pengeluaranPerBulan[bulanKey].keterangan.add(kas.nama);
           pengeluaranPerBulan[bulanKey].jumlah += harga;
         });
-        
         // Convert ke array untuk tabel pengeluaran
         const pengeluaranData = Object.keys(pengeluaranPerBulan)
           .map(bulanKey => {
             const [year, month] = bulanKey.split('-');
             const bulanTahun = `${new Date(year, parseInt(month)-1, 1).toLocaleString('id-ID', { month: 'long' })} ${year}`;
             const data = pengeluaranPerBulan[bulanKey];
-            const keteranganStr = data.keterangan.length > 0 
-              ? data.keterangan.join(', ') 
-              : 'Pengeluaran';
-            
+            const keteranganStr = Array.from(data.keterangan).join(', ') || 'Pengeluaran';
             return {
               id: bulanKey,
               tanggal: bulanTahun,
@@ -288,7 +267,6 @@ export default () => {
           .filter(item => item.jumlah > 0)
           .sort((a, b) => b.tanggalSort - a.tanggalSort)
           .slice(0, 10);
-        
         setPengeluaranTableData(pengeluaranData);
         // Hitung total pengeluaran
         const totalPengeluaranVal = pengeluaranData.reduce((sum, curr) => sum + (curr.jumlah || 0), 0);
